@@ -1,0 +1,4 @@
+<span class="reading-time">
+  {% assign words = include.content | strip_html | number_of_words %}
+  {{ words | divided_by:180 | plus:1 }} min read
+</span>

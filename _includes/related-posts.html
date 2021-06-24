@@ -1,0 +1,129 @@
+<div class="related-posts">
+<span class="related-posts-heading">Related Posts:</span><br>
+
+{% comment %}
+If you change number of related posts to show, you'll have to update
+post_index_N and post_tag_count_N variables to match that number,
+as well as "LOGIC" part in the loop
+{% endcomment %}
+{% assign RELATED_POSTS_THRESHOLD = 3 %}
+
+{% assign related_post_count = 0 %}
+
+{% comment %}
+Liquid has no way of creating objects or array.
+We have to use "flat" variables
+{% endcomment %}
+{% assign post_index_1 = null %}
+{% assign post_index_2 = null %}
+{% assign post_index_3 = null %}
+
+{% assign post_tag_count_1 = 0 %}
+{% assign post_tag_count_2 = 0 %}
+{% assign post_tag_count_3 = 0 %}
+
+{% for post in site.posts %}
+  {% comment %}
+  Skip the current post
+  {% endcomment %}
+  {% if page.title == post.title %}
+    {% continue %}
+  {% endif %}
+
+  {% comment %}
+  Calculate the number of matching tags between posts
+  {% endcomment %}
+  {% assign tag_match_count = 0 %}
+
+  {% for category in post.categories %}
+    {% if page.categories contains category %}
+      {% assign tag_match_count = tag_match_count | plus: 1 %}
+    {% endif %}
+  {% endfor %}
+
+  {% assign post_index = forloop.index0 %}
+
+  {% comment %}
+  LOGIC
+  If the number of matched post is larger than one of the current values
+  we also have to check that the current value is equal or smaller than other
+  current values.
+  This ensures we will always have posts with the best match.
+  {% endcomment %}
+  {% if tag_match_count > post_tag_count_1 and post_tag_count_1 <= post_tag_count_2 and post_tag_count_1 <= post_tag_count_3 %}
+    {% assign post_tag_count_1 = tag_match_count %}
+    {% assign post_index_1 = post_index %}
+  {% elsif tag_match_count > post_tag_count_2 and post_tag_count_2 <= post_tag_count_1 and post_tag_count_2 <= post_tag_count_3 %}
+    {% assign post_tag_count_2 = tag_match_count %}
+    {% assign post_index_2 = post_index %}
+  {% elsif tag_match_count > post_tag_count_3 and post_tag_count_3 <= post_tag_count_1 and post_tag_count_3 <= post_tag_count_2 %}
+    {% assign post_tag_count_3 = tag_match_count %}
+    {% assign post_index_3 = post_index %}
+  {% endif %}
+{% endfor %}
+
+{% comment %}
+Loop through the posts again and display only ones saved in post_index_N variables
+{% endcomment %}
+{% for post in site.posts %}
+  {% if forloop.index0 == post_index_1 or forloop.index0 == post_index_2 or forloop.index0 == post_index_3 %}
+    {% include related-posts-single-post.html %}
+
+    {% assign related_post_count = related_post_count | plus: 1 %}
+  {% endif %}
+{% endfor %}
+
+{% assign posts_left = RELATED_POSTS_THRESHOLD | minus: related_post_count %}
+
+{% comment %}
+If we haven't matched the threshold, just display the latest posts from the same category
+I use only one category per post
+{% endcomment %}
+{% if posts_left > 0 %}
+  {% capture post_category %}{{ page.category | first }}{% endcapture %}
+
+  {% for category in site.categories %}
+    {% capture current_category %}{{ category | first }}{% endcapture %}
+    {% if current_category == post_category %}
+      {% for post in site.categories[current_category] %}
+        {% comment %}
+        Skip current and already related posts
+        {% endcomment %}
+        {% if page.title == post.title or page.title == site.posts[post_index_1].title or page.title == site.posts[post_index_2].title or page.title == site.posts[post_index_3].title %}
+          {% continue %}
+        {% endif %}
+        {% if posts_left == 0 %}
+          {% break %}
+        {% endif %}
+
+        {% assign posts_left = posts_left | minus: 1 %}
+
+        {% include related-posts-single-post.html %}
+
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% comment %}
+If we haven't matched the threshold, just display the latest posts
+{% endcomment %}
+{% if posts_left > 0 %}
+  {% for post in site.posts %}
+    {% comment %}
+    Skip current and already related posts
+    {% endcomment %}
+    {% if page.title == post.title or forloop.index0 == post_index_1 or forloop.index0 == post_index_2 or forloop.index0 == post_index_3 %}
+      {% continue %}
+    {% endif %}
+    {% if posts_left == 0 %}
+      {% break %}
+    {% endif %}
+
+    {% assign posts_left = posts_left | minus: 1 %}
+    {% include related-posts-single-post.html %}
+
+  {% endfor %}
+{% endif %}
+
+</div>
