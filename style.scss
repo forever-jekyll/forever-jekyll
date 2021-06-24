@@ -1,0 +1,611 @@
+---
+---
+
+@import "variables";
+
+html {
+  font-size: 100%;
+}
+
+body {
+  background: $white;
+  font-family: $sans-font-family;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.66666666667;
+  color: $darkGray;
+  font-feature-settings: "kern" 1;
+  font-kerning: normal;
+  display: flex;
+  min-height: 100vh;
+  height: 100%;
+  margin: 0;
+  flex-direction: column;
+  overflow-wrap: break-word;
+}
+
+h1, h2, h3, h4, h5, h6,
+p, blockquote, pre,
+ul, ol, dl, figure,
+%vertical-rhythm {
+  margin-bottom: 15px;
+}
+
+.container {
+  flex: 1 0 auto;
+  margin: 0 auto;
+  max-width: 740px;
+  padding: 0 10px;
+  width: 100%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 01em 0 15px;
+  color: $darkerGray;
+  font-family: $sans-font-family;
+  font-weight: 700;
+  line-height: 1.66666666667;
+}
+
+h1 {
+  font-size: 30px;
+  a {
+    color: inherit;
+  }
+}
+
+h2 {font-size: 28px;}
+
+h3 {font-size: 24px;}
+
+h4 {font-size: 20px;}
+
+h5 {font-size: 16px;}
+
+h6 {font-size: 14px;}
+
+small, .text_small {font-size: 14px;}
+
+a {
+  color: $blue;
+  text-decoration: none;
+
+  &:visited {
+    color: $purple;
+  }
+
+  &:hover {
+    color: $blue;
+    text-decoration: underline;
+  }
+}
+
+ul, ol {
+  margin: 15px 0;
+  padding-left: 30px;
+}
+
+ul {
+  list-style-type: disc;
+}
+
+ol {
+  list-style-type: decimal;
+}
+
+ol ul, ul ol, ul ul, ol ol {
+  margin: 0;
+}
+
+ul ul, ol ul {
+  list-style-type: circle;
+}
+
+em, i {
+  font-style: italic;
+}
+
+strong, b {
+  font-weight: bold;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+figure > img {
+  display: block;
+}
+
+figcaption {
+  font-size: 14px !important;
+}
+
+.gmnoprint img {
+  max-width: none;
+}
+
+hr {
+  position: relative;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  border: 01px solid $lightGray;
+}
+
+.date {
+  font-weight: bold;
+  color: $gray;
+  margin-top: 30px;
+}
+
+.post-categories {
+  font-weight: bold;
+  color: $gray;
+  margin-top: 15px;
+
+  .categories-button {
+    display: inline-block;
+    text-align: center;
+    border: 01px solid $paleGray;
+    border-radius: 03px;
+    background: #ffffff;
+    font-weight: 400;
+    color: $gray;
+    font-size: 16px !important;
+    white-space: nowrap;
+    text-decoration: none;
+    padding: 06px 12px;
+    margin-right: 04px;
+    cursor: pointer;
+    user-select: none;
+    transition: .4s;
+  }
+
+  .categories-button:hover {
+    color: $darkGray;
+    text-decoration: underline;
+  }
+
+  .categories-button:visited {
+    color: inherit;
+  }
+}
+
+.share-post {
+  font-weight: bold;
+  color: $gray;
+  margin-top: 15px;
+  }
+
+.no-comments {
+  font-weight: bold;
+  color: $gray;
+  margin-top: 15px;
+}
+
+.related-posts {
+  margin-top:30px;
+
+  .related-posts-heading{
+    margin: 0;
+    padding: 0;
+    font-weight: bold;
+    color: $gray;
+  }
+}
+
+.related-posts-post {
+  margin-bottom: auto;
+}
+
+.post-nav {
+  font-size: 18px !important;
+  margin-top:30px;
+  clear: both;
+
+    p {
+      .post-nav-label {
+        margin: 0;
+        padding: 0;
+        font-weight: bold;
+        color: $gray;
+      }
+
+      &:first-child {
+        padding-right: auto;
+        float: left;
+      }
+
+      &:last-child {
+        padding-left: auto;
+        float: right;
+      }
+    }
+}
+
+.category-head {
+  font-weight: bold;
+  //font-style: italic;
+  color: $gray;
+}
+
+::-moz-selection {
+  color: $white;
+  background: $blue;
+}
+::selection {
+  color: $white;
+  background: $blue;
+}
+
+blockquote {
+  background-color: $white;
+  color: $gray;
+  border-left: 04px solid #eeeeee;
+  padding-left: 15px;
+  font-size: 16px !important;
+  font-style: italic;
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  i, em {
+    font-style: normal;
+  }
+}
+
+pre,
+code {
+  font-family: $code-font-family !important;
+  font-size: 16px !important;
+  color: #586e75;
+  border: 01px solid #dddddd;
+  border-radius: 03px;
+  background-color: #fdf6e3;
+}
+
+code {
+  padding: 01px 03.55px;
+}
+
+pre {
+  padding: 08px 12px;
+  overflow-x: auto;
+
+  > code {
+    border: 0;
+    padding-right: 0;
+    padding-left: 0;
+  }
+}
+
+.highlight {
+  border-radius: 03px;
+  background: #fdf6e3;
+  @extend %vertical-rhythm;
+
+  .highlighter-rouge & {
+    background: #fdf6e3;
+  }
+}
+
+.rouge-table {
+  margin-bottom: 0;
+  font-size: 100%;
+
+  &,
+  td,
+  th {
+    border: none;
+    text-align: left;
+    padding: 0px;
+  }
+
+  .gutter {
+    vertical-align: top;
+    user-select: none;
+    opacity: .25;
+  }
+}
+
+.gist .gist-file {
+  font-family: $code-font-family !important;
+}
+.gist .markdown-body {
+  padding: 15px;
+}
+.gist pre {
+  padding: 0;
+  background-color: transparent;
+}
+.gist .gist-file .gist-data {
+  font-size: 16px !important;
+}
+.gist code {
+  padding: 0;
+  color: inherit;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+table {
+  margin-bottom: 30px;
+  width: 100%;
+  border-collapse: collapse;
+  overflow-x: auto;
+  border: 01px solid #dddddd;
+  
+  & + table {
+    margin-top: 30px;
+  }
+  
+  tr {
+    &:nth-child(even) {
+      background-color: #efefef;
+    }
+  }
+  
+  th, td {
+    padding: 10px 15px;
+  }
+  
+  th {
+    background-color: #efefef;
+    border: 01px solid #dddddd;
+  }
+  
+  td {
+    border: 01px solid #dddddd;
+  }
+  
+  tr,
+  td,
+  th {
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  @include mobile {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+            -ms-overflow-style: -ms-autohiding-scrollbar;
+  }
+}
+
+a[href^="#fn:"],
+a[href^="#fnref:"] {
+  display: inline-block;
+  margin-left: 0.1rem;
+  font-weight: bold;
+}
+
+.footnotes {
+  margin-top: 15px;
+  font-size: 14px !important;
+}
+
+.hidden,
+[hidden] {
+  display: none !important;
+}
+
+/*********************/
+/* LAYOUT / SECTIONS */
+/*********************/
+
+//
+// .masthead
+//
+
+.wrapper-masthead {
+  margin-bottom: 50px;
+}
+
+.masthead {
+  display: flex;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 01px solid $lightGray;
+
+  @include mobile {
+    display: block;
+    text-align: center;
+  }
+}
+
+.site-avatar {
+  width: 70px;
+  height: 70px;
+  margin-right: 15px;
+
+  @include mobile {
+    float: none;
+    display: block;
+    margin: 0 auto;
+  }
+
+  img {
+    border-radius: 03px;
+  }
+}
+
+.site-info {
+  flex: 1;
+  align-self: flex-start;
+
+  @include mobile {
+    float: none;
+    display: block;
+    margin: 0 auto;
+  }
+}
+
+.site-name {
+  margin: 0;
+  color: $darkGray;
+  font-family: $sans-font-family;
+  font-weight: 300;
+  font-size: 28px !important;
+  letter-spacing: 01px;
+
+  a {
+    &:hover {
+      color: $mahogany !important;
+      text-decoration: none;
+    }
+    &:visited {
+      color: inherit;
+    }
+  }
+}
+
+.site-description {
+  margin: -05px 0 0 0;
+  color: $gray;
+  font-size: 16px !important;
+
+  @include mobile {
+    margin: 03px 0;
+  }
+}
+
+nav {
+  font-family: $sans-font-family;
+  font-size: 18px !important;
+
+  @include mobile {
+    float: none;
+    margin-top: 09px;
+    display: block;
+    font-size: 16px !important;
+  }
+
+  a {
+    margin-left: 20px;
+    color: $darkGray;
+    text-align: right;
+    font-weight: 300;
+    letter-spacing: 01px;
+
+      &:hover {
+        color: inherit;
+        text-decoration: underline;
+      }
+      &:visited {
+        color: inherit;
+      }
+        @include mobile {
+          margin: 0 10px;
+          color: $blue;
+        }
+  }
+}
+
+.nav-menu-item.active,
+a.nav-menu-item:focus {
+  text-decoration: none;
+  color: $mahogany;
+}
+
+.clearfix:before,
+.clearfix:after {
+  content: " ";
+  display: table;
+  }
+
+.clearfix:after {
+  clear: both;
+  }
+
+//
+// .main
+//
+
+.posts > .post {
+  padding-bottom: 02em;
+  border-bottom: 01px solid $lightGray;
+}
+
+.posts > .post:last-child {
+  padding-bottom: 01em;
+  border-bottom: none;
+}
+
+.post {
+
+  .comments {
+    margin-top: 10px;
+  }
+
+  .read-more {
+    text-transform: uppercase;
+    font-size: 14px !important;
+    color: $mahogany;
+
+    a {
+      color: $mahogany;
+      text-decoration: none;
+    }
+
+      &:visited {
+        color: $mahogany;
+      }
+
+        &:hover {
+          color: $mahogany;
+          text-decoration: underline;
+        }
+  }
+
+  .reading-time {
+    text-transform: uppercase;  
+    font-size: 14px !important;
+    color: $mahogany;
+  }
+}
+
+.wrapper-footer {
+  margin-top: 30px;
+  border-top: 01px solid #ddd;
+  border-bottom: 01px solid #ddd;
+  background-color: $lightGray;
+}
+
+footer {
+  padding: 20px 0;
+  text-align: center;
+
+  .social-icons {
+    margin-bottom: 08px;
+  }
+
+  .social-icon {
+    display: inline-block;
+    padding: 0 04px;
+    color: $gray;
+    
+      &:hover {
+      color: $darkGray;
+      }
+  }
+}
+
+.copyright {
+  font-size: 14px !important;
+
+  p {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+// Settled on moving the import of syntax highlighting to the bottom of the CSS
+// ... Otherwise it really bloats up the top of the CSS file and makes it difficult to find the start
+@import "message";
+@import "share-buttons";
+@import "spotify-embed";
+@import "syntax";
+@import "pagination";
