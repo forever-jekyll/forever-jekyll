@@ -1,0 +1,38 @@
+@charset "utf-8";
+
+//
+// VARIABLES
+//
+
+// Colors
+$white: #FFFFFF;
+$black: #000000;
+$gray: #666666;
+$lightGray: #EEEEEE;
+$paleGray: #DDDDDD;
+$darkGray: #333333;
+$darkerGray: #222222;
+$blue: #4183C4;
+$purple: #4141C4;
+$mahogany: #BD2C00;
+
+// Pagination colors
+$pagination-color: $darkGray;
+$pagination-hover-color: $blue;
+$pagination-active-bg: $blue;
+$pagination-active-color: $white;
+$pagination-separator-color: $paleGray;
+
+// Font stacks
+$sans-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Segoe UI Symbol", "Segoe UI Emoji", "Apple Color Emoji", Roboto, "Helvetica Neue", Helvetica, "Noto Sans", Arial, sans-serif;
+$code-font-family: "Menlo", "Inconsolata", "Consolas", "Roboto Mono", "Ubuntu Mono", "Liberation Mono", "Courier New", monospace;
+
+// Mobile breakpoints
+@mixin mobile {
+  @media screen and (max-width: 640px) {
+    @content;
+  }
+}
+
+// Transitions
+$time: 250ms;

@@ -1,0 +1,15 @@
+.embed-spotify {
+    position: relative;
+    padding-bottom: 100%;
+    height: 0;
+    overflow: hidden;
+    max-width: 100%;
+}
+
+.embed-spotify iframe, .embed-spotify object, .embed-spotify embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
