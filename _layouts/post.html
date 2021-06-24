@@ -1,0 +1,46 @@
+---
+layout: default
+---
+
+<article class="post">
+  <h1>{{ page.title }}</h1>
+
+  <div class="entry">
+    {{ content }}
+  </div>
+
+  <div class="date">
+    <i class="fa fa-calendar fa-fw" aria-hidden="true"></i>&nbsp;Date:<span style="color: #333333; font-weight: normal;">&nbsp;{{ page.date | date: "%B %e, %Y" }}</span>
+  </div>
+
+  <div class="post-categories">
+    <i class="fa fa-tags fa-fw" aria-hidden="true"></i>&nbsp;Tags:&nbsp;
+      {% if post %}
+      {% assign categories = post.categories %}
+      {% else %}
+      {% assign categories = page.categories %}
+      {% endif %}
+      {% for category in categories %}
+      <a class="categories-button"<a href="{{site.baseurl}}/categories/#{{category|slugize}}">{{category}}</a>
+      {% unless forloop.last %}{% endunless %}
+      {% endfor %}
+  </div>
+
+  <div class="share-post">
+    <i class="fa fa-share-alt-square fa-fw" aria-hidden="true"></i>&nbsp;Share:&nbsp;
+    {% include share-buttons.html %}
+  </div>
+
+  <div class="no-comments">
+    <i class="fa fa-commenting fa-fw" aria-hidden="true"></i>&nbsp;Comments:&nbsp;<span style="color: #333333; font-weight: normal;">I don't have comments on this blog as they not only are difficult to manage, but are also prone to privacy and security risks.<br>Instead of leaving a comment, you could <a href="mailto:pclink1@y7mail.com">Email me</a> directly.</span>
+  </div>
+
+  <div class="related-posts">
+    {% include related-posts.html %}
+  </div>
+
+  <div class="post-nav">
+    {% include post-nav.html %}
+  </div>
+
+</article>
