@@ -6,7 +6,7 @@
 name: Forever Jekyll
 
 # Short bio or description (displayed in the header)
-description: A simply elegant and full featured Jekyll theme
+description: A simple, elegant and full featured Jekyll theme
 
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
 avatar: /assets/image/avatar.png
@@ -32,6 +32,9 @@ navigation_links:
 
   - title: About
     url: /about
+
+  - title: Search
+    url: /search
 
 # Footer icons
 footer_links:
