@@ -64,7 +64,7 @@ kramdown:
   # Use GitHub flavored markdown, including triple backtick fenced code blocks
   input: GFM
   # Jekyll 3 and GitHub Pages now support rouge for syntax highlighting
-  syntax_highlighter: pygments
+  syntax_highlighter: rouge
   syntax_highlighter_opts:
     # Use existing pygments syntax highlighting css
     css_class: 'highlight'
@@ -85,7 +85,6 @@ gems:
   - jekyll-gist
   - jekyll-paginate
   - jekyll-seo-tag
-  - pygments.rb
 
 # Exclude these files from your production _site
 exclude:
