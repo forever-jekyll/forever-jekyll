@@ -41,7 +41,7 @@ Not convinced yet about `Forever Jekyll`? Here is a **live demo** of `Forever Je
 Hopefully that live demo has convinced you, hasn't it? Great! Continue with me...  
 
 ## Getting started
-In the top-right corner of this page, click Fork.  
+In the top-right corner of this page, click `Fork`.  
 `GitHub` will prompt you to sign in. If you don't have a `GitHub` account you can easily create one from that page.  
 Next rename your newly forked repository to `yourgithubusername.github.io`. This is an important step.  
 For example your `GitHub` user name is `elaine-thompson` then name of your repository will be,  
