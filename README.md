@@ -98,8 +98,8 @@ This site will let you download the generated favicons in a zip file. Unzip that
 In your repository there is a file named `about.md`. Open it and add some content related to your site/blog. You can write a short description about yourself, your background, about your website. Possibilities are endless. Try and make this page interesting. Adding a picture is always a good idea. You can also share ways to contact you on this page if you wish. Once you have finished writing a killer introduction to you and your site, don't forget to save the changes by clicking on `Commit changes` button at the bottom left.  
 
 ## Enabling comments
-Comments are not enabled by default in Forever Jekyll but this functionality can easily be added.  
-Forever Jekyll uses `Cactus Comments`. It is a privacy respecting federated comment system built on Matrix protocol.  
+Comments are not enabled by default in `Forever Jekyll` but this functionality can easily be added.  
+`Forever Jekyll` uses `Cactus Comments`. It is a privacy respecting federated comment system built on Matrix protocol.  
 `Cactus Comments` is completely free and open source.  
 First you need to register your site with `Cactus Comments`. To do so, click on the following link,  
 
@@ -132,19 +132,38 @@ Save the following link with the name `_cactus.scss` just like we did earlier.
 [_cactus.scss](https://github.com/forever-jekyll/propaganda/raw/main/_cactus.scss)  
 
 Now Navigate back to your site repository and open the folder `_layouts`.  
-
 Upload the `default.html` file via `Add file` -> `Upload files` option.  
-
 Open this file `default.html` in your site repository and go to the line number **120**,  
 ```
 siteName: "elaine-thompson.github.io",
 ```  
 Replace `elaine-thompson.github.io` with the site name you just registered on `Cactus Comments`.  
-
 Don't forget to save the changes by clicking on `Commit Changes` button.  
 
 Next upload the `post.html` file to the folder `_layouts` via `Add file` -> `Upload files` option.  
-
 In your site repository go to folder `_sass` and upload `_cactus.scss` file via `Add file` -> `Upload files` option.  
 
 That's it. Kudos! You have successfully enabled commenting system on your site.  
+
+## Enabling web analytics
+Like comments web analytics is not enabled by default in `Forever Jekyll` but this can easily be added.  
+`Forever Jekyll` uses `GoatCounter`. It is an open source and privacy friendly web analytics platform.  
+`GoatCounter` is free for non-commercial use. To sign up for `GoatCounter` click open the following link,  
+
+[Sign up for GoatCounter](https://www.goatcounter.com/signup)  
+
+Next navigate back to your site repository and open the file `default.html` in the folder `_layouts`.  
+Right at the end of the file you'll see following closing tags,  
+```
+</body>
+</html>
+```  
+Add the following snippet right before those closing tags,  
+```
+<script data-goatcounter="https://MYCODE.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+```  
+Of-course you'll have to replace `MYCODE` in the snippet above with your actual `GoatCounter` code acquired during the sign up.  
+Save the changes by clicking on `Commit Changes` button.  
+
+Well-done! You have successfully enabled an ethical and privacy friendly web analytics system for your site.   
