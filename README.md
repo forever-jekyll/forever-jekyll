@@ -142,6 +142,11 @@ Don't forget to save the changes by clicking on `Commit Changes` button.
 
 Next upload the `post.html` file to the folder `_layouts` via `Add file` -> `Upload files` option.  
 In your site repository go to folder `_sass` and upload `_cactus.scss` file via `Add file` -> `Upload files` option.  
+And finally open the file `style.scss` in your site repository. Add the following line at the very end of the file,  
+```
+@import "cactus";
+```  
+Save the changes by clicking on `Commit Changes` button.  
 
 That's it. Kudos! You have successfully enabled commenting system on your site.  
 
