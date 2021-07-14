@@ -85,6 +85,7 @@ gems:
   - jekyll-gist
   - jekyll-paginate
   - jekyll-seo-tag
+  - jemoji
 
 # Exclude these files from your production _site
 exclude:
