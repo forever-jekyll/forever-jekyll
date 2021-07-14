@@ -1,9 +1,5 @@
 # [Forever Jekyll - A simple, elegant & full featured Jekyll theme](https://forever-jekyll.github.io)
-Well, as the name suggests, `Forever Jekyll` is a theme-template-boilerplate for `Jekyll`. Primary goal of `Forever Jekyll` is to make the task of building a personal website with `Jekyll` so easy that even a person with non-computing background should be able to do it with ease.  
-
-You can check-out this animated GIF if you wish to have a sneak peek at `Forever Jekyll` before continuing,  
-
-:trumpet::trumpet: [**Forever Jekyll GIF**](https://i.imgur.com/a6r9sIE.gif) :trumpet::trumpet:  
+`Forever Jekyll` is a theme-template-boilerplate for `Jekyll`. Primary goal of `Forever Jekyll` is to make the task of building a personal website with `Jekyll` so easy that even a person with non-computing background should be able to do it with ease.  
 
 ## Introduction
 In an era of internet everyone should have a personal website or a blog. Their own personal space on `WWW`. It shouldn't be too difficult to own a personal web space in 21st century, right? Yes, right but apparently it is not that easy. To be honest it is difficult and confusing. It shouldn't be, but is. `Blogger` has long been dead. `Weebly` and `Wix` are not up to the quality mark to say the least. `WordPress` and `ghost` are not free. Site generators like `Jekyll`, `Hugo`, `Grav`, `Gatsby`, `Pelican` are great but they all require a fair amount of expertise in programming language(s) and a very good knowledge of computers and operating system(s), plus you'll have to host the created site somewhere on your own. This is one of the primary reasons why so many people with a dream of starting a blog or creating their own website end-up leaving their dreams unfulfilled. Now picture is not entirely black, there are a few options and solutions out there that can help an average person create his/her own blog/site without too many hassles and for free. Free as in Beer and free as in Freedom too. `Forever Jekyll` is one of them.  
@@ -53,6 +49,7 @@ That's it. Your site will be available a few seconds later at `https://yourgithu
 
 ## Customizing your site
 Now that your site is up and running it's time to customize it and truly make it yours.  
+
 Click on `_config.yml` file in your repository and next click on the `pencil icon` on the right hand corner.  
 First thing you'd want to change in this file is the name of your website. Edit the following line with your desired site name,  
 ```
@@ -71,15 +68,19 @@ url: https://forever-jekyll.github.io
 You can add links to some or all of your social networks, online accounts, emails, even phone numbers if you wish to the footer at the bottom of your site.  
 To do so you need to edit the `footer_links:` section in the file. Remove the ones used by the theme first and then add some of your accounts.  
 For example you can add a link to your `Facebook` account like this,  
-  `- title: Facebook
-    url: https://facebook.com/your.facebook.username
-    icon: fa fa-facebook-square`
+  ```
+  - title: Facebook  
+    url: https://facebook.com/your.facebook.username  
+    icon: fa fa-facebook-square  
+```  
 
 One more example. To add Your `reddit` account you need to add this to `footer_links:`,  
-  `- title: reddit
-    url: https://www.reddit.com/user/your.reddit.username
-    icon: fa fa-reddit-square`  
-    
+```
+- title: reddit  
+  url: https://www.reddit.com/user/your.reddit.username  
+  icon: fa fa-reddit-square  
+```  
+
 Save the file by clicking on `Commit changes` button in the bottom left.  
 
 Time to add your avatar and favicons to your site.  
@@ -92,6 +93,58 @@ Okay now it's time for favicons. A favicon is a site icon. You'll need an image 
 
 [https://favycon.vercel.app/](https://favycon.vercel.app/)  
 
-This site will let you download the generated favicons in a zip file. Unzip that file and then in your `GitHub` repository go to `assets` -> `image` folder and upload all the extracted image files via `Add file` -> `Upload files`. Don't upload any `xml` or `json` file please.  
+This site will let you download the generated favicons in a zip file. Unzip that file and then in your `GitHub` repository go to `assets` -> `image` folder and upload all the extracted image files via `Add file` -> `Upload files`. Don't upload any `xml` or `json` files please.  
 
 In your repository there is a file named `about.md`. Open it and add some content related to your site/blog. You can write a short description about yourself, your background, about your website. Possibilities are endless. Try and make this page interesting. Adding a picture is always a good idea. You can also share ways to contact you on this page if you wish. Once you have finished writing a killer introduction to you and your site, don't forget to save the changes by clicking on `Commit changes` button at the bottom left.  
+
+## Enabling comments
+Comments are not enabled by default in Forever Jekyll but this functionality can easily be added.  
+Forever Jekyll uses `Cactus Comments`. It is a privacy respecting federated comment system built on Matrix protocol.  
+`Cactus Comments` is completely free and open source.  
+First you need to register your site with `Cactus Comments`. To do so, click on the following link,  
+
+[chat with @cactusbot:cactus.chat](https://matrix.to/#/@cactusbot:cactus.chat)  
+
+Clicking on that link will take you to the `Matrix` page and you'll be prompted to choose an app to continue.  
+Select `Element` and click on `continue`.  
+On the next page click on `Continue in your browser`.  
+On the next page click on `Send a Direct Message`. It'll prompt you to either `Sign In` or to `Create Account`.  
+After signing in to your account send following text as a direct message,  
+```
+register <YOUR-SITE-NAME>
+```  
+For example,  
+```
+register elaine-thompson.github.io
+```  
+50% of work done.  
+
+Right click on the following link and select `Save link as...` option and save the file with the name `default.html`.  
+
+[default.html](https://github.com/forever-jekyll/propaganda/raw/a6a98c79f871fb51fc18ba2fc6f3364ce33c4d62/default-with-comments-.html)  
+
+Right click on the following link and again select `Save link as...` option and save the file with the name `post.html`.  
+
+[post.html](https://github.com/forever-jekyll/propaganda/raw/main/post-with-comments.html)  
+
+Save the following link with the name `_cactus.scss` just like we did earlier.  
+
+[_cactus.scss](https://github.com/forever-jekyll/propaganda/raw/main/_cactus.scss)  
+
+Now Navigate back to your site repository and open the folder `_layouts`.  
+
+Upload the `default.html` file via `Add file` -> `Upload files` option.  
+
+Open this file `default.html` in your site repository and go to the line number **120**,  
+```
+siteName: "elaine-thompson.github.io",
+```  
+Replace `elaine-thompson.github.io` with the site name you just registered on `Cactus Comments`.  
+
+Don't forget to save the changes by clicking on `Commit Changes` button.  
+
+Next upload the `post.html` file to the folder `_layouts` via `Add file` -> `Upload files` option.  
+
+In your site repository go to folder `_sass` and upload `_cactus.scss` file via `Add file` -> `Upload files` option.  
+
+That's it. Kudos! You have successfully enabled commenting system on your site.  
