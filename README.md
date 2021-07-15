@@ -172,3 +172,56 @@ Of-course you'll have to replace `MYCODE` in the snippet above with your actual 
 Save the changes by clicking on `Commit Changes` button.  
 
 Well-done! You have successfully enabled an ethical and privacy friendly web analytics system for your site.   
+
+## Writing posts
+The `_posts` folder is where your blog posts live.  
+Posts in `Jekyll` are text files and `Jekyll` provides everything you need to turn it into a blog.  
+`Jekyll` posts are typically written in `Markdown` but you can also write in `HTML` if you wish.  
+All post files must begin with front matter. What's a front matter?  
+A front matter is typically used to set a layout or other meta data.  
+But at this point in time all that technical stuff is strictly not necessary for you to remember.  
+All you need to remember is, you'll have to begin every new post with following snippet,  
+```  
+---
+layout: post
+title: Title of your post
+categories: [category 1, category 2]
+---
+```  
+`title:` in the above snippet is obviously the title of your post.  
+`categories:` A blog category can either be a word or a group of words separated by a comma.  
+Choose them wisely and use them to give a gist of the post or post's content.  
+`Categories` can play a crucial role in organizing your site’s posts properly. It is also considered a good SEO practice.  
+`Categories` makes it easy for your potential web visitors to navigate around your site and offers a good user experience.  
+
+Now coming to actual writing. `Markdown` doesn't require any special application. You can write in `Markdown` everywhere.  
+But for someone who is new to `Markdown` I would recommend any of these three editors,  
+ - [Abricotine](https://abricotine.brrd.fr/)  
+ - [Mark Text](https://marktext.app/)  
+ - [Zettlr](https://www.zettlr.com/)  
+
+After you have completed your post, you'll have to save the post file in `_posts` folder in your repository.  
+`Jekyll` is very particular about the post filename format. Every post filename must follow this format,  
+```
+YEAR-MONTH-DAY-title.md
+```  
+An example,  
+```
+2011-12-31-new-years-eve-is-awesome.md
+```  
+One more example,  
+```
+2012-09-12-how-to-write-a-blog.md
+```  
+A bit odd but not that difficult, right?!?  
+
+## Conclusion
+I'm pretty sure that this should be good enough for almost everyone to get started with `Forever Jekyll` in particular and `Blogging` in general.  
+But I'm also aware that I must have missed a few things in this README and there will be a few unexplained things left behind.  
+In such a case feel free to [start a discussion](https://github.com/forever-jekyll/forever-jekyll/discussions/). Everything related to `ForeverJekyll` is welcome.  
+
+> Your personal website or blog might not change the world but it will certainly change you.  
+~ Me  
+
+> It is necessary to write, if the days are not to slip emptily by. How else, indeed, to clap the net over the butterfly of the moment? for the moment passes, it is forgotten; the mood is gone; life itself is gone.  
+~ Vita Sackville-West  
