@@ -28,6 +28,7 @@ Before continuing I'm sure you would want to know what `Forever Jekyll` has to o
 - Post read time.  
 - Site search.  
 - RSS feed.  
+- Emojis.  
 - And last but not the least free hosting support out-of-the-box.  
 
 Not convinced yet about `Forever Jekyll`? Here is a **live demo** of `Forever Jekyll`,  
@@ -203,6 +204,7 @@ Choose them wisely and use them to give a gist of the post or post's content.
 `Categories` makes it easy for your potential web visitors to navigate around your site and offers a good user experience.  
 
 Now coming to actual writing. `Markdown` doesn't require any special application. You can write in `Markdown` everywhere.  
+Here is a very good resource to get you started with `Markdown`=> [Markdown Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).  
 But for someone who is new to `Markdown` I would recommend any of these three editors,  
  - [Abricotine](https://abricotine.brrd.fr/)  
  - [Mark Text](https://marktext.app/)  
@@ -222,6 +224,8 @@ One more example,
 2012-09-12-how-to-write-a-blog.md
 ```  
 A bit odd but not that difficult, right?!?  
+
+I've included a sample post in `_posts` directory to get you started. Feel free to delete it when you are ready with your first post.  
 
 ## Conclusion
 I'm pretty sure that this should be good enough for almost everyone to get started with `Forever Jekyll` in particular and `Blogging` in general.  
