@@ -10,6 +10,7 @@ Before continuing I'm sure you would want to know what `Forever Jekyll` has to o
 - Simple, clean and distraction free layout.  
 - Responsive theme design.  
 - Mobile optimized theme.  
+- Dark mode toggle
 - Good looking and readable font stack.  
 - Font Awesome icon set.  
 - Search engine optimization.  
