@@ -173,6 +173,7 @@ hr {
 }
 
 .share-post {
+  isolation: isolate;
   font-weight: bold;
   color: $gray;
   margin-top: 15px;
@@ -282,6 +283,7 @@ pre {
 }
 
 .highlight {
+  isolation: isolate;  
   border-radius: 03px;
   background: #fdf6e3;
   @extend %vertical-rhythm;
@@ -311,6 +313,7 @@ pre {
 }
 
 .gist .gist-file {
+  isolation: isolate;
   font-family: $code-font-family !important;
 }
 .gist .markdown-body {
@@ -324,6 +327,7 @@ pre {
   font-size: 16px !important;
 }
 .gist code {
+  isolation: isolate;
   padding: 0;
   color: inherit;
   background-color: transparent;
