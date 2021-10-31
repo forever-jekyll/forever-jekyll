@@ -17,7 +17,7 @@ avatar: https://avatars.githubusercontent.com/u/40621030?v=4
 
 # Your website URL (e.g. https://forever-jekyll.github.io or https://forever-jekyll.com)
 # Used for Sitemap.xml and your RSS feed
-url: https://forever-jekyll.github.io
+url: https://wonbeomjang.github.io
 
 # If you're hosting your site at a Project repository on GitHub pages
 # (http://yourusername.github.io/repository-name)
@@ -37,10 +37,10 @@ navigation_links:
     url: /search
 
 # Footer icons
-footer_links:
-  - title: Feed
-    url: feed.xml
-    icon: fa fa-rss-square
+# footer_links:
+#   - title: Feed
+#     url: feed.xml
+#     icon: fa fa-rss-square
 
 #   - title: Twitter
 #     url: https://twitter.com/jekyllrb
