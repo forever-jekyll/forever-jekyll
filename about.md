@@ -4,39 +4,41 @@ title: About
 permalink: /about/
 ---
 
-CAU Computer Vision Machine Learning Lab: Undergraduate Researcher  
+CAU Computer Vision Machine Learning Lab: 학부연구생
 [CV-Korean](/assets/cv/cv_kor.pdf)  
 [CV-English](/assets/cv/cv_eng.pdf)  
 
-### Brief Information
-I'm undergraduate Student studying Computer Vison.  
-I'm in [Prography](http://www.prography.org/) as a deep learning mentor and [CVML](http://cau.ac.kr/~jskwon/), Chung-Ang University as undergraduate Intern. 
+### 정보
+안녕하세요. 컴퓨터비전을 공부하고 있는 대학샙입니다.
+[프로그라피](http://www.prography.org/)라는 개발동아리에서 딥러닝 운영진을 했었고, 중앙대학교 [CVML](http://cau.ac.kr/~jskwon/) 학부연구행을 진행했습니다.
   
+### 기술스택
+- 언어: Python, C++, JAVA
+- 프레임워크: Pytorch, Libtorch, Django
 
-### Technologies Used
+### 활동
 
-- Language: Python, C++, JAVA
-- Frame Work: Pytorch, Libtorch, Django
-
-### Career
+#### 2021
+- [카나리아: 모두를 위한 군사보안 경보 시스템](https://github.com/wonbeomjang/AI_APP_WEB_Canary_Canary) [2021 군장병 온라인 해커톤: 해군참모총장상] 
+  [yolov5-knowledge-distillation](https://github.com/wonbeomjang/yolov5-knowledge-distillation) 구현
 
 #### 2020
-- [DPS](https://github.com/DeepPaperStudy) deep learning paper study
-- Single image super resolution by improving ESRGAN, RankSRGAN.
+- [DPS](https://github.com/DeepPaperStudy) 딥러닝 논문공부 스터디
 
 #### 2019
-- [Fashion recomentation system](https://github.com/wonbeomjang/5th-deepfashion-deep-classification)
-- [Prography](http://www.prography.org/) deep learning montor
-- Xcorps: image compression using deep learning
-  [Deep image compresion via end to end learning](https://github.com/wonbeomjang/Image-compression-pytorch)
-- Style transfer 
+- [시각장애인을 위한 약학정보제공서비스](https://www.facebook.com/zipyak/) [배리어프리 앱 개발 콘테스트: 장려상]
+- [패션추천시스템](https://github.com/wonbeomjang/5th-deepfashion-deep-classification)
+- [프로그라피](http://www.prography.org/) 딥러닝멘토
+- 이미지 스타일변환
   [style transfer library](https://github.com/wonbeomjang/style-transfer), 
-  [implement ESRGAN](https://github.com/wonbeomjang/ESRGAN-pytorch), 
-  [implement style transfer using cnn](https://github.com/wonbeomjang/style-transfer)
+  [ESRGAN 구현](https://github.com/wonbeomjang/ESRGAN-pytorch), 
+  [style transfer using cnn 구현](https://github.com/wonbeomjang/style-transfer)
+  
 #### 2018
-- Implementing SegNet based on Mobilenet (Hair Dyeing Application)   
-  [mobile hair segmentation](https://github.com/wonbeomjang/mobile-hair-segmentation-pytorch/)
-- Prography deep learning mentee
-- Admission to [Chung-Ang University](https://cse.cau.ac.kr/eng/main.php), Republic of Korea
-### Contact me
+- Mobilenetv2를 base로 한 segnet구현 (염색어플리케이션)   
+  [HairMattNet](https://github.com/wonbeomjang/mobile-hair-segmentation-pytorch/) 구현
+- 프로그라피 딥러닝 멘티
+- [중앙대학교](https://cse.cau.ac.kr/eng/main.php) 입학, Republic of Korea
+
+### 연락처
 [jtiger958@gmail.com](mailto:jtiger958@gmail.com)
