@@ -32,9 +32,12 @@ navigation_links:
 
   - title: About
     url: /about
+    
+  - title: Categories
+    url: /categories
 
-  - title: Search
-    url: /search
+#   - title: Search
+#     url: /search
 
 # Footer icons
 # footer_links:
