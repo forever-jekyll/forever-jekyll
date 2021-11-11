@@ -32,6 +32,9 @@ navigation_links:
 
   - title: About
     url: /about
+    
+  - title: Categories
+    url: /categories
 
   - title: Search
     url: /search
