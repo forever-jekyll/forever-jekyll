@@ -1,0 +1,62 @@
+---
+layout: post
+title:  "[OSAM] 3. 이제 끝나는 건가?"
+date:   2021-10-29 18:50:11 +0900
+tags: [OSAM]
+comments: true
+---
+
+해커톤이 끝나간다. 그런데 프론트는 아직 안 끝났고 결과물 제출 일주일 전에 갑자기 인스타그램 연동, 지속적인 학습 및 모델 업데이트, 로그를 넣자고 한다.
+나는 반대했지만 우리와 비슷한 아이디어를 가진 다른팀이 있어 다수의 의견대로 진행하기로 했다.
+
+<p align='center'><img src='https://user-images.githubusercontent.com/86545225/137576790-1e7b5459-fdbd-4cc8-9e3b-d27a3bd3b1b4.jpg'></p>  
+
+그렇게 로그를 추가하고...
+
+<p align='center'><img src='https://user-images.githubusercontent.com/40621030/141277496-ceffd608-0249-485a-8cd0-3118a97544bd.PNG'></p>  
+
+인스타봇을 추가하고...
+
+<p align='center'><img src='https://user-images.githubusercontent.com/40621030/137886632-edd9ca08-831e-4b29-97da-62b6bae0982b.PNG'></p>  
+
+대충 이런 REST API서버를 장고로 만들고...  
+
+이제 진짜 끝났다.
+
+## 이제 진짜 끝
+
+<table>
+ <tr>
+  <td align='center'><img src="https://user-images.githubusercontent.com/86545225/137917096-372ec2f3-60ab-4e49-ab98-cb87ca96aa88.PNG" width="200"/></td>
+  <td align='center'><img src="https://user-images.githubusercontent.com/86545225/137917134-a9d63375-3663-467a-8ea3-2d5a92950085.PNG" width="200"/></td>
+  <td align='center'><img src="https://user-images.githubusercontent.com/86545225/137917734-1f88e1c0-5f2f-4f2e-a7f5-d3ddb3019b81.png" width="200"/></td>
+ </tr>
+
+ <tr>
+  <td align='center'><img src="https://user-images.githubusercontent.com/86545225/137917171-afe0567c-4cc5-4bf7-84dd-862c1cec4819.PNG" width="200"/></td>
+  <td align='center'><img src="https://user-images.githubusercontent.com/86545225/137919288-c90a06c7-c843-407f-ba5e-aed914cf3fd5.PNG" width="200"/></td>
+  <td align='center'><img src="https://user-images.githubusercontent.com/86545225/137919350-567523d8-255e-466a-a834-12014eeb4679.PNG" width="200"/></td>
+ </tr>
+
+ <tr>
+  <td align='center'><img src="https://user-images.githubusercontent.com/86545225/137919337-f2109767-9daa-427d-85f7-2dad831202db.png" width="200"/></td>
+  <td align='center'><img src="https://user-images.githubusercontent.com/86545225/137919583-8a2fd884-c0c3-4bfb-8099-aeb03b7ce081.png" width="200"/></td>
+  <td align='center'><img src="https://user-images.githubusercontent.com/86545225/137919328-6390d7ea-207c-49c9-a0b8-97c4eab44d47.PNG" width="200"/></td>
+ </tr>
+<table>
+  
+**어플 완성!!!!**  
+
+제출 2일전에 드디어 완성시키고 그 다음 문서를 작성했다. 주최측에서 README로 개발문서를 만들라고 해서 README에 문서를 떄려 박았다.
+
+[github readme](https://github.com/osamhack2021/AI_APP_WEB_Canary_Canary), 
+[ppt](https://docs.google.com/presentation/d/1s4Sa52awVV3G2vbk3Qd4I2jI2PlZm4a3-0RNrLDudvI/edit?usp=sharing)
+
+## 결과
+11월 8일 최종결과 발표였는데 국방부 승인이 나지 않아서 11월 11일에 나왔다.
+결과는 두구둑두구....  
+  
+<p align='center'><img src='https://user-images.githubusercontent.com/40621030/141281402-ad7c28a5-3032-4564-a7f8-e7cf00cb7fa0.PNG'></p>  
+
+해군참모총장상을 받았다. 8등 정도 한 것 같았는데 아쉬웠지만 다들 프로젝트를 처음한다고 하니까 다행이라 생각한다.
+5주 동안 고생한 나에게 박주를 ()
