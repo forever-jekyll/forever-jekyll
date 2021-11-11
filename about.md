@@ -1,9 +1,9 @@
 ---
 layout: page
-title: About
+title: Acerca
+image: /assets/image/1.jpg
 permalink: /about
 ---
 
-Hi, Write an awesome description about your blog here.  
-Feel free to make it a bit more interesting by adding a picture or two.  
-Only limit here is your creativity and imagination. Unleash them with full force.  
+Nos gusta pensar con tranquilidad, sin prisas, a la manera de las tortugas. Por eso son la imagen de nuestro portal. 
+
