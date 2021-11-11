@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Archive
+title: Archivo
 ---
 
 # Archive
 
-Browse all posts by month and year.
+Navega por las entradas según mes y año.
 
 {% assign postsByYearMonth = site.posts | group_by_exp: "post", "post.date | date: '%B %Y'" %}
 {% for yearMonth in postsByYearMonth %}
