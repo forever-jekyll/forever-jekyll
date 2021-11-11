@@ -3,7 +3,7 @@ layout: post #require
 title: "시각장애인을 위한 약학정보제공 서비스 기획기"
 author: "wonbeomjang"
 date: 2020-01-03 21:49 # 작성 날짜 등록 
-tags: [product-design] # 원하는 태그 등록 
+categories: [product-design] # 원하는 태그 등록 
 image: 'https://wonbeomjang.github.io/assets/posts/zipyak/zipyak-icon.png' # 원하는 이미지 url 등록 
 ---
 
