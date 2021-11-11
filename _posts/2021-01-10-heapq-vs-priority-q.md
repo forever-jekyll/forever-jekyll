@@ -2,7 +2,7 @@
 layout: post
 title:  "[Python] 우선순위 큐 (heapq vs priority queue)"
 date:   2021-01-10 15:41:11 +0900
-tags: [Data Structure, Python]
+categories: [Data Structure, Python]
 comments: true
 ---
 
