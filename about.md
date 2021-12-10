@@ -21,10 +21,10 @@ CAU Computer Vision Machine Learning Lab: 학부연구생
 #### 2021
 - [카나리아: 모두를 위한 군사보안 경보 시스템](https://github.com/wonbeomjang/AI_APP_WEB_Canary_Canary) [2021 군장병 온라인 해커톤: 해군참모총장상] 
   [yolov5-knowledge-distillation](https://github.com/wonbeomjang/yolov5-knowledge-distillation) 구현
-
+- [Deep-plane sweep generative adversarial network for consistent multi-view depth estimation](https://link.springer.com/article/10.1007/s00138-021-01258-7) 2nd author
+- 
 #### 2020
 - [DPS](https://github.com/DeepPaperStudy) 딥러닝 논문공부 스터디
-- [Deep-plane sweep generative adversarial network for consistent multi-view depth estimation](https://www.researchgate.net/publication/356270771_Deep-plane_sweep_generative_adversarial_network_for_consistent_multi-view_depth_estimation) 2
 
 #### 2019
 - [시각장애인을 위한 약학정보제공서비스](https://www.facebook.com/zipyak/) [배리어프리 앱 개발 콘테스트: 장려상]
