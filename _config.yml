@@ -2,6 +2,9 @@
 # This file contains configuration flags to customize your site
 #
 
+# Site locale
+lang: "en"
+
 # Name of your site (displayed in the header)
 name: Forever Jekyll
 
