@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 'Pastejacking Smart Contracts Replacing Wallet Addresses to Steal Data'
+title: 'Pastejacking Smart Contracts: Replacing Wallet Addresses to Steal Data'
 categories: [crypto, cybersecurity]
 ---
 
