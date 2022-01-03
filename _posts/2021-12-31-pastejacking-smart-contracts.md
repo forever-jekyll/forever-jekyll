@@ -1,10 +1,9 @@
 ---
 layout: post
-title: Pastejacking Smart Contracts Replacing Wallet Addresses to Steal Data
+title: Pastejacking Smart Contracts: Replacing Wallet Addresses to Steal Data
 categories: [crypto, cybersecurity]
 ---
 
-# Pastejacking Smart Contracts: Replacing Wallet Addresses to Steal Data
 The last several years have brought incredible gains in the number of cyberattacks waged. These attacks entail a variety of exploits, with some using methods as simple as social engineering. Human behavior is often the weakest link, and a particular javascript exploit takes advantage of trust in a computer’s copy-and-paste functionality.  This form of attack, commonly referred to as [pastejacking](https://www.geeksforgeeks.org/what-is-pastejacking/), can fit into many different cyberattack campaigns. This attack takes advantage of one of the most common user interactions with a computer.
 
 Pastejacking attacks exploit temporary storage memory by replacing copied data stored in device memory with different, often malicious, data. This exploit may take the form of a client-side or a server-side attack. 
