@@ -5,11 +5,10 @@ permalink: /about/
 ---
 
 CAU Computer Vision Machine Learning Lab: 학부연구생
-[CV-Korean](/assets/cv/cv_kor.pdf)  
-[CV-English](/assets/cv/cv_eng.pdf)  
+[포트폴리오](https://www.notion.so/wonbeomjang/ba2731830460430584d7493db36e2089)  
 
 ### 정보
-안녕하세요. 컴퓨터비전을 공부하고 있는 대학샙입니다.
+안녕하세요. 컴퓨터비전을 공부하고 있는 대학생입니다.
 [프로그라피](http://www.prography.org/)라는 개발동아리에서 딥러닝 운영진을 했었고, 중앙대학교 [CVML](http://cau.ac.kr/~jskwon/) 학부연구행을 진행했습니다.
   
 ### 기술스택
@@ -22,7 +21,7 @@ CAU Computer Vision Machine Learning Lab: 학부연구생
 - [카나리아: 모두를 위한 군사보안 경보 시스템](https://github.com/wonbeomjang/AI_APP_WEB_Canary_Canary) [2021 군장병 온라인 해커톤: 해군참모총장상] 
   [yolov5-knowledge-distillation](https://github.com/wonbeomjang/yolov5-knowledge-distillation) 구현
 - [Deep-plane sweep generative adversarial network for consistent multi-view depth estimation](https://link.springer.com/article/10.1007/s00138-021-01258-7) 2nd author
-- 
+
 #### 2020
 - [DPS](https://github.com/DeepPaperStudy) 딥러닝 논문공부 스터디
 
