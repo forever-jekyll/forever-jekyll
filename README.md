@@ -83,6 +83,27 @@ One more example. To add Your `reddit` account you need to add this to `footer_l
   icon: fa fa-reddit-square  
 ```  
 
+It's time to set the time zone for your site generation. This sets the TZ environment variable, which Ruby uses to handle time and date creation and manipulation. Any entry from the tz database name (IANA time zone database) is valid here. You can get the tz database name for your location from this Wikipedia article,  
+[https://en.wikipedia.org/wiki/List_of_tz_database_time_zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)  
+
+After finding the tz database name for your location, replace the value `null` in the following line with the tz database name,  
+```
+timezone: null
+```
+
+A few examples,  
+```
+timezone: Africa/Lagos
+timezone: America/Buenos_Aires
+timezone: Asia/Kolkata
+timezone: Atlantic/Madeira
+timezone: Australia/Perth
+timezone: Brazil/West
+timezone: Canada/Yukon
+timezone: Europe/Dublin
+timezone: US/Mountain
+```
+
 Save the file by clicking on `Commit changes` button in the bottom left.  
 
 Time to add your avatar and favicons to your site.  
@@ -225,6 +246,20 @@ One more example,
 2012-09-12-how-to-write-a-blog.md
 ```  
 A bit odd but not that difficult, right?!?  
+
+It is always a great idea to keep the main (index) page of your blog uncluttered and concise. So rather than displaying the complete post on the main page, we can display summery or excerpt of the post there. `Forever Jekyll` makes it really easy to truncate posts and let you select the amount of content you wish to display on the main page. All you have to do is, add `<!--more-->` on a newline from where you want to truncate the post. An example. Say you have following post you want to publish,  
+```
+But I must explain to you how all this mistaken idea of re-probating pleasure and extolling pain arose. To do so, I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?  
+On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammeled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.  
+```
+You want to only display the first paragraph and truncate the post after that on the main page. It can easily be done by just adding `<!--more-->` like this,  
+```
+But I must explain to you how all this mistaken idea of re-probating pleasure and extolling pain arose. To do so, I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?  
+<!--more-->
+On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammeled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.  
+```
+
+I highly recommend adding excerpts to your posts using `<!--more-->` as shown above to keep your main blog/site page uncluttered and easy to navigate. You can find more examples of this on `Forever Jekyll` demo site as every post there has been truncated usin the above technique.  
 
 I've included a sample post in `_posts` directory to get you started. Feel free to delete it when you are ready with your first post.  
 
