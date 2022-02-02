@@ -120,6 +120,8 @@ figure > img {
 
 figcaption {
   font-size: 14px !important;
+  margin-top: -20px;
+  text-align: center;
 }
 
 .gmnoprint img {
@@ -128,21 +130,21 @@ figcaption {
 
 hr {
   position: relative;
-  margin-top: 15px;
-  margin-bottom: 15px;
+  margin-top: 35px;
+  margin-bottom: 35px;
   border: 01px solid $lightGray;
 }
 
 .date {
   font-weight: bold;
   color: $gray;
-  margin-top: 30px;
+  margin-bottom: 35px;
 }
 
 .post-categories {
   font-weight: bold;
   color: $gray;
-  margin-top: 15px;
+  margin-bottom: 40px;
 
   .categories-button {
     display: inline-block;
@@ -176,18 +178,16 @@ hr {
   isolation: isolate;
   font-weight: bold;
   color: $gray;
-  margin-top: 15px;
+  margin-bottom: 30px;
   }
 
 .no-comments {
   font-weight: bold;
   color: $gray;
-  margin-top: 15px;
+  margin-bottom: 25px;
 }
 
 .related-posts {
-  margin-top:30px;
-
   .related-posts-heading{
     margin: 0;
     padding: 0;
@@ -202,7 +202,8 @@ hr {
 
 .post-nav {
   font-size: 18px !important;
-  margin-top:30px;
+  margin-top: -10px;
+  margin-bottom: 35px;
   clear: both;
 
     p {
@@ -227,7 +228,6 @@ hr {
 
 .category-head {
   font-weight: bold;
-  //font-style: italic;
   color: $gray;
 }
 
