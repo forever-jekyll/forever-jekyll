@@ -1,5 +1,5 @@
 ---
-layout: video
+layout: page
 title: You (Almost) Got Pwned!
 permalink: /shadowrealm/
 ---
@@ -8,3 +8,4 @@ permalink: /shadowrealm/
 
 That could've been bad. Luckily for you, my goal is to educate rather than attack. 
 
+#### Stay vigilant
