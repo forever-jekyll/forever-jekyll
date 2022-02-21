@@ -95,6 +95,7 @@ gems:
   - jekyll-paginate
   - jekyll-seo-tag
   - jemoji
+  - webrick
 
 # Exclude these files from your production _site
 exclude:
