@@ -4,8 +4,6 @@ title: You (Almost) Got Pwned!
 permalink: /shadowrealm/
 ---
 
-## You almost got PWNED!
+That could've been bad. Following random links has gotten many people in trouble. Luckily for you, my goal is to educate rather than attack. 
 
-That could've been bad. Luckily for you, my goal is to educate rather than attack. 
-
-#### Stay vigilant
+### Stay vigilant

