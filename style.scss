@@ -46,12 +46,19 @@ ul, ol, dl, figure,
 }
 
 h1, h2, h3, h4, h5, h6 {
-  margin: 01em 0 15px;
+  font-family: $helveticaNeue;
   color: $darkerGray;
-  font-family: $sans-font-family;
-  font-weight: 700;
-  line-height: 1.66666666667;
+  font-weight: bold;
+
+  line-height: 1.7;
+  margin: 1em 0 15px;
+  padding: 0;
+
+  @include mobile {
+    line-height: 1.4;
+  }
 }
+
 
 h1 {
   font-size: 30px;
@@ -60,11 +67,11 @@ h1 {
   }
 }
 
-h2 {font-size: 28px;}
+h2 {font-size: 24px;}
 
-h3 {font-size: 24px;}
+h3 {font-size: 20px;}
 
-h4 {font-size: 20px;}
+h4 {font-size: 18px;}
 
 h5 {font-size: 16px;}
 
