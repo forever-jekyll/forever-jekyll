@@ -54,9 +54,9 @@ If your site is not up and running, go to `Settings => Pages => Source` and make
 Now that your site is up and running it's time to customize it and truly make it yours.  
 
 Click on `_config.yml` file in your repository and next click on the `pencil icon` on the right hand corner.  
-First thing you'd want to change in this file is the name of your website. Edit the following line with your desired site name,  
+First thing you'd want to change in this file is the title of your website. Edit the following line with your desired site title,  
 ```
-name: Forever Jekyll
+title: Forever Jekyll
 ```  
 
 Next, it's time to change the description of your website. To do so edit this line,  
