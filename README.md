@@ -48,6 +48,7 @@ For example your `GitHub` user name is `elaine-thompson` then name of your repos
 Another example. If your `GitHub` user name is `bolt-usain` then name of your repository will be,  
 `bolt-usain.github.io`  
 That's it. Your site will be available a few seconds later at `https://yourgithubusername.github.io` - if not, give it a few minutes as `GitHub` suggests and it'll appear soon.  
+If your site is not up and running, go to `Settings => Pages => Source` and make sure that `Branch: main` is set to `/ (root)`. Hit the `Save` button after making the change and your site should be available shortly.  
 
 ## Customizing your site
 Now that your site is up and running it's time to customize it and truly make it yours.  
