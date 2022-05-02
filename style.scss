@@ -14,8 +14,14 @@ body {
   font-size: 18px;
   line-height: 1.66666666667;
   color: $darkGray;
-  font-feature-settings: "kern" 1;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
   font-kerning: normal;
+  font-variant-ligatures: common-ligatures contextual;
+  -moz-font-feature-settings: "kern", "liga", "clig", "calt";
+  -ms-font-feature-settings: "kern", "liga", "clig", "calt";
+  -webkit-font-feature-settings: "kern", "liga", "clig", "calt";
+  font-feature-settings: "kern", "liga", "clig", "calt";
   display: flex;
   min-height: 100vh;
   height: 100%;
@@ -120,6 +126,8 @@ figure > img {
 
 figcaption {
   font-size: 14px !important;
+  margin-top: -20px;
+  text-align: center;
 }
 
 .gmnoprint img {
@@ -128,21 +136,21 @@ figcaption {
 
 hr {
   position: relative;
-  margin-top: 15px;
-  margin-bottom: 15px;
+  margin-top: 35px;
+  margin-bottom: 35px;
   border: 01px solid $lightGray;
 }
 
 .date {
   font-weight: bold;
   color: $gray;
-  margin-top: 30px;
+  margin-bottom: 35px;
 }
 
 .post-categories {
   font-weight: bold;
   color: $gray;
-  margin-top: 15px;
+  margin-bottom: 40px;
 
   .categories-button {
     display: inline-block;
@@ -176,18 +184,16 @@ hr {
   isolation: isolate;
   font-weight: bold;
   color: $gray;
-  margin-top: 15px;
+  margin-bottom: 30px;
   }
 
 .no-comments {
   font-weight: bold;
   color: $gray;
-  margin-top: 15px;
+  margin-bottom: 25px;
 }
 
 .related-posts {
-  margin-top:30px;
-
   .related-posts-heading{
     margin: 0;
     padding: 0;
@@ -202,7 +208,8 @@ hr {
 
 .post-nav {
   font-size: 18px !important;
-  margin-top:30px;
+  margin-top: -10px;
+  margin-bottom: 35px;
   clear: both;
 
     p {
@@ -227,7 +234,6 @@ hr {
 
 .category-head {
   font-weight: bold;
-  //font-style: italic;
   color: $gray;
 }
 
@@ -260,7 +266,7 @@ blockquote {
 pre,
 code {
   font-family: $code-font-family !important;
-  font-size: 16px !important;
+  font-size: 15px !important;
   color: #586e75;
   border: 01px solid #dddddd;
   border-radius: 03px;
@@ -283,7 +289,7 @@ pre {
 }
 
 .highlight {
-  isolation: isolate;  
+  isolation: isolate;
   border-radius: 03px;
   background: #fdf6e3;
   @extend %vertical-rhythm;
@@ -324,7 +330,7 @@ pre {
   background-color: transparent;
 }
 .gist .gist-file .gist-data {
-  font-size: 16px !important;
+  font-size: 15px !important;
 }
 .gist code {
   isolation: isolate;
@@ -340,30 +346,30 @@ table {
   border-collapse: collapse;
   overflow-x: auto;
   border: 01px solid #dddddd;
-  
+
   & + table {
     margin-top: 30px;
   }
-  
+
   tr {
     &:nth-child(even) {
       background-color: #efefef;
     }
   }
-  
+
   th, td {
     padding: 10px 15px;
   }
-  
+
   th {
     background-color: #efefef;
     border: 01px solid #dddddd;
   }
-  
+
   td {
     border: 01px solid #dddddd;
   }
-  
+
   tr,
   td,
   th {
@@ -405,7 +411,7 @@ a[href^="#fnref:"] {
 //
 
 .wrapper-masthead {
-  margin-bottom: 50px;
+  margin-bottom: auto;
 }
 
 .masthead {
@@ -565,7 +571,7 @@ a.nav-menu-item:focus {
   }
 
   .reading-time {
-    text-transform: uppercase;  
+    text-transform: uppercase;
     font-size: 14px !important;
     color: $mahogany;
   }
@@ -590,7 +596,7 @@ footer {
     display: inline-block;
     padding: 0 04px;
     color: $gray;
-    
+
       &:hover {
       color: $darkGray;
       }
