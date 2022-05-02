@@ -17,6 +17,7 @@ Before continuing I'm sure you would want to know what `Forever Jekyll` has to o
 - Sass/SCSS preprocessor support.  
 - Privacy friendly commenting system (optional).  
 - Privacy friendly analytics system (optional).  
+- Google analytics system (optional).  
 - Syntax highlighting.  
 - Multimedia content (Video, Audio, Images, Playlists, Maps) embedding.  
 - Lightbox for images and videos.  
@@ -195,7 +196,40 @@ Add the following snippet right before those closing tags,
 Of-course you'll have to replace `MYCODE` in the snippet above with your actual `GoatCounter` code acquired during the sign up.  
 Save the changes by clicking on `Commit Changes` button.  
 
-Well-done! You have successfully enabled an ethical and privacy friendly web analytics system for your site.   
+Well-done! You have successfully enabled an ethical and privacy friendly web analytics system for your site.  
+
+## Enabling Google analytics  
+It's quite easy to implement `Google analytics` in `Forever Jekyll`. Here is how you can do it,  
+
+Create a file with the name `google-analytics.html` in the `_includes` directory. Add the following code into it and save the file,  
+
+```html
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics }}"></script>
+<script>
+  window['ga-disable-{{ site.google_analytics }}'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){window.dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', '{{ site.google_analytics }}');
+</script>
+```
+
+Next open-up the `_config.yml` file and add,  
+
+`google_analytics: UA-XXXXXXXX-X`
+
+Of-course, replace `UA-XXXXXXXX-X` with your actual `Google tracking ID` above.  
+
+And finally, add the following code snippet to the `default.html` file in the `_layouts` directory right below the `{% include meta.html %}` line,  
+
+```html
+{%- if jekyll.environment == 'production' and site.google_analytics -%}
+  {%- include google-analytics.html -%}
+{%- endif -%}
+```
+
+Save the file and voila! you have successfully enabled `Google analytics` for your website!
 
 ## Support
 
