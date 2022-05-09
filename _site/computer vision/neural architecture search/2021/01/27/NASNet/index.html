@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+<meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+
+<meta name="description" content="2017년에 NASNet이 나온 이후 2018년 부터 AutoML의 시대가 열렸습니다.
+MnasNet, MobileNet V3, EffientNet등 여러 경량화 네트워크들은 NAS(Neural Architecture Search)을 사용했고, 모바일쪽 네트워크들은 많이 NAS를 사용하고 있습니다.
+이번에 소개할 논문은 Neural Architecture Search with Reinforcement Learning를 소개해드리겠습니다.
+
+Neural Architecture Search은 RNN을 사용하여 model description을 생성하고 생성된 네트워크를 학습합니다.
+그리고 validation set을 이용하여 accuracy를 구하고 이를 reward로 만듭니다.
+후에 이 reward를 갖고 policy gradient를 구해 controller를 업데이트 시킵니다.
+
+
+
+Generate Model Description
+NAS에서 controller가 model description을 만듭니다.
+model description을 갖고 model을 만든 다음 학습을 시킵고 수렴이 되면 validation set으로 accuracy를 측정하게 됩니다.
+controller RNN의 파라미터 는 validation accuracy의 평균을 이용해 최적화 시킵니다.
+
+
+
+Training With REINFORCE
+controller를 학습시키려면 우리는 loss 함수를 정의해야합니다.
+controller에서 만들어진 네트워크를 child network라고 하겠습니다. 
+그리고 child network를 구성하기 위한 action들을 , 학습된 child network의 validation accuracy를 R이라고 할 때 는 다음과 같습니다.
+
+
+$$J(\theta_c)=E_{P(a_{1:T};\theta_c)}[R]$$
+
+
+reward signal인 R은 미분 불가능하기 떄문에 REINFORCE라는 policy로 update를 합니다.
+이는 다음과 같은 식으로 만들 수 있고
+
+
+$$\nabla_{\theta_c} J(\theta_c) = \sum_{t=1}^{T}E_{P(a_1:T; \theta_c)}[\nabla_{\theta_c} logP(a_t | a_{(t-1):1}; theta_c) R]$$  
+
+
+따라서 위의 식은 다음과 같이 근사될 수 있습니다.
+
+
+$$\frac{1}{m} \sum_{k=1}^{m} \sum_{t=1}^{T} \nabla_{\theta_c} logP(a_t | a_{(t-1):1}; {\theta_c}) R_k$$  
+
+
+m은 한 배치에 controller가 만들 child network의 개수이고 k번째 child network의 validation accuracy를 이다.
+위의 식은 불편 추정치이지만 분산이 크기 때문에 분산을 줄이기 위해서 다음과 같은 식을 씁니다.
+
+
+$$\frac{1}{m} \sum_{k=1}^{m} \sum_{t=1}^{T} \nabla_{\theta_c} logP(a_t | a_{(t-1):1}; {\theta_c}) (R_k-b)$$  
+
+
+b는 이전 네트워크들의 validation accuracy의 지수이동평균입니다.
+
+Skip Connection
+GoogleNet, ResNet같은 네트워크들은 skip connection을 통해 성능을 높힙니다.
+이와 같이 NASNet에서도 skip connection을 생성하기 위해 다음과 같이 설정했습니다.
+
+layer N에서 이전의 layer으로 부터 skip connection이 있는지를 결정하는 N-1개의 content-based sigmoid(anchor point)를 추가합니다.
+
+
+P(Layer j is an input to layer i) = $$sigmoid(v^T tanh(W_{prev} * h_j + W_{curr} * h_i))$$  
+
+
+는 j번째 layer의 controller의 hiddenstate이고 그 값은 0 부터 N-1까지 가질 수 있다.
+
+
+
+하지만 이렇게 연결하다보면 구조가 망가지는 경우가 있기 때문에 다음과 같은 규칙을 정한다.
+
+
+  input layer로 쓴 layer는 다른 layer의 input layer가 되지 않는다.
+  skip connection이 안되어있는 layer를 다 final layer에 connection을 만든다.
+  만약 skip connection시 layer의 size가 다르면 zero padding을 한다.
+
+
+Result
+
+
+Opinion
+손수 만든 네트워크들에 비해 그렇게까지 정확도가 높다고 말할 수는 없지만 그래도 AutoML로 만들었다는 것에 의의가 있는 것 같습니다.
+그리고 실험결과를 볼 때 filter들은 직사각형이 많다라는 말이 있는데 무작위로 뽑아도 직사각형이 될 확률이 높아서 그렇지 않을까 생각합니다.
+" />
+<meta property="og:description" content="2017년에 NASNet이 나온 이후 2018년 부터 AutoML의 시대가 열렸습니다.
+MnasNet, MobileNet V3, EffientNet등 여러 경량화 네트워크들은 NAS(Neural Architecture Search)을 사용했고, 모바일쪽 네트워크들은 많이 NAS를 사용하고 있습니다.
+이번에 소개할 논문은 Neural Architecture Search with Reinforcement Learning를 소개해드리겠습니다.
+
+Neural Architecture Search은 RNN을 사용하여 model description을 생성하고 생성된 네트워크를 학습합니다.
+그리고 validation set을 이용하여 accuracy를 구하고 이를 reward로 만듭니다.
+후에 이 reward를 갖고 policy gradient를 구해 controller를 업데이트 시킵니다.
+
+
+
+Generate Model Description
+NAS에서 controller가 model description을 만듭니다.
+model description을 갖고 model을 만든 다음 학습을 시킵고 수렴이 되면 validation set으로 accuracy를 측정하게 됩니다.
+controller RNN의 파라미터 는 validation accuracy의 평균을 이용해 최적화 시킵니다.
+
+
+
+Training With REINFORCE
+controller를 학습시키려면 우리는 loss 함수를 정의해야합니다.
+controller에서 만들어진 네트워크를 child network라고 하겠습니다. 
+그리고 child network를 구성하기 위한 action들을 , 학습된 child network의 validation accuracy를 R이라고 할 때 는 다음과 같습니다.
+
+
+$$J(\theta_c)=E_{P(a_{1:T};\theta_c)}[R]$$
+
+
+reward signal인 R은 미분 불가능하기 떄문에 REINFORCE라는 policy로 update를 합니다.
+이는 다음과 같은 식으로 만들 수 있고
+
+
+$$\nabla_{\theta_c} J(\theta_c) = \sum_{t=1}^{T}E_{P(a_1:T; \theta_c)}[\nabla_{\theta_c} logP(a_t | a_{(t-1):1}; theta_c) R]$$  
+
+
+따라서 위의 식은 다음과 같이 근사될 수 있습니다.
+
+
+$$\frac{1}{m} \sum_{k=1}^{m} \sum_{t=1}^{T} \nabla_{\theta_c} logP(a_t | a_{(t-1):1}; {\theta_c}) R_k$$  
+
+
+m은 한 배치에 controller가 만들 child network의 개수이고 k번째 child network의 validation accuracy를 이다.
+위의 식은 불편 추정치이지만 분산이 크기 때문에 분산을 줄이기 위해서 다음과 같은 식을 씁니다.
+
+
+$$\frac{1}{m} \sum_{k=1}^{m} \sum_{t=1}^{T} \nabla_{\theta_c} logP(a_t | a_{(t-1):1}; {\theta_c}) (R_k-b)$$  
+
+
+b는 이전 네트워크들의 validation accuracy의 지수이동평균입니다.
+
+Skip Connection
+GoogleNet, ResNet같은 네트워크들은 skip connection을 통해 성능을 높힙니다.
+이와 같이 NASNet에서도 skip connection을 생성하기 위해 다음과 같이 설정했습니다.
+
+layer N에서 이전의 layer으로 부터 skip connection이 있는지를 결정하는 N-1개의 content-based sigmoid(anchor point)를 추가합니다.
+
+
+P(Layer j is an input to layer i) = $$sigmoid(v^T tanh(W_{prev} * h_j + W_{curr} * h_i))$$  
+
+
+는 j번째 layer의 controller의 hiddenstate이고 그 값은 0 부터 N-1까지 가질 수 있다.
+
+
+
+하지만 이렇게 연결하다보면 구조가 망가지는 경우가 있기 때문에 다음과 같은 규칙을 정한다.
+
+
+  input layer로 쓴 layer는 다른 layer의 input layer가 되지 않는다.
+  skip connection이 안되어있는 layer를 다 final layer에 connection을 만든다.
+  만약 skip connection시 layer의 size가 다르면 zero padding을 한다.
+
+
+Result
+
+
+Opinion
+손수 만든 네트워크들에 비해 그렇게까지 정확도가 높다고 말할 수는 없지만 그래도 AutoML로 만들었다는 것에 의의가 있는 것 같습니다.
+그리고 실험결과를 볼 때 filter들은 직사각형이 많다라는 말이 있는데 무작위로 뽑아도 직사각형이 될 확률이 높아서 그렇지 않을까 생각합니다.
+" />
+
+<meta name="author" content="Playground of Wonbeomjang" />
+
+
+<meta property="og:title" content="[AutoML] NASNet" />
+<meta property="twitter:title" content="[AutoML] NASNet" />
+
+<title>[AutoML] NASNet – Playground of Wonbeomjang – undergraduated conputer vision researcher</title>
+
+    <link rel="stylesheet" type="text/css" href="/style.css"/>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/ress/dist/ress.min.css"/>
+    <link rel="apple-touch-icon" sizes="57x57" href="/assets/image/favicon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/assets/image/favicon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/image/favicon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/assets/image/favicon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/assets/image/favicon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/assets/image/favicon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/assets/image/favicon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/assets/image/favicon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/image/favicon-180x180.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/image/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/image/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/assets/image/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/image/favicon-192x192.png">
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/image/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/assets/image/favicon.ico">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/assets/image/favicon-144x144.png">
+    <meta name="msapplication-config" content="/assets/image/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="alternate" type="application/rss+xml" title="Playground of Wonbeomjang - undergraduated conputer vision researcher" href="/feed.xml"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css" integrity="sha256-XoaMnoYC5TH6/+ihMEnospgm0J1PM/nioxbOUdnM8HY=" crossorigin="anonymous" media="print" onload="this.media='all'"/>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.6.5/plyr.css" media="print" onload="this.media='all'"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" media="print" onload="this.media='all'"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.css" integrity="sha384-zTROYFVGOfTw7JV7KUu8udsvW2fx4lWOsCEDqhBreBwlHI4ioVRtmIvEThzJHGET" crossorigin="anonymous" media="print" onload="this.media='all'"/>
+
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://avatars.githubusercontent.com/u/40621030?v=4" width="70" height="70" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Playground of Wonbeomjang</a></h1>
+            <p class="site-description">undergraduated conputer vision researcher</p>
+          </div>
+
+          <nav class="nav-menu">
+            
+  <a class="nav-menu-item" href="/">Blog</a>
+
+  <a class="nav-menu-item" href="/about">About</a>
+
+  <a class="nav-menu-item" href="/categories">Categories</a>
+
+  <a class="nav-menu-item" href="https://github.com/wonbeomjang">GitHub</a>
+
+
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>[AutoML] NASNet</h1>
+
+  <div class="entry">
+    <p>2017년에 NASNet이 나온 이후 2018년 부터 AutoML의 시대가 열렸습니다.
+MnasNet, MobileNet V3, EffientNet등 여러 경량화 네트워크들은 NAS(Neural Architecture Search)을 사용했고, 모바일쪽 네트워크들은 많이 NAS를 사용하고 있습니다.
+이번에 소개할 논문은 <a href="https://arxiv.org/pdf/1611.01578.pdf">Neural Architecture Search with Reinforcement Learning</a>를 소개해드리겠습니다.</p>
+
+<p>Neural Architecture Search은 RNN을 사용하여 model description을 생성하고 생성된 네트워크를 학습합니다.
+그리고 validation set을 이용하여 accuracy를 구하고 이를 reward로 만듭니다.
+후에 이 reward를 갖고 policy gradient를 구해 controller를 업데이트 시킵니다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/40621030/105997147-9dbfae80-60ee-11eb-9477-1c820fdb31cb.png" alt="Figure1" /></p>
+
+<h2 id="generate-model-description">Generate Model Description</h2>
+<p>NAS에서 controller가 model description을 만듭니다.
+model description을 갖고 model을 만든 다음 학습을 시킵고 수렴이 되면 validation set으로 accuracy를 측정하게 됩니다.
+controller RNN의 파라미터 <script type="math/tex">\theta_c</script>는 validation accuracy의 평균을 이용해 최적화 시킵니다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/40621030/106002532-98fdf900-60f4-11eb-9e16-597b22b9371d.png" alt="Figure2" /></p>
+
+<h2 id="training-with-reinforce">Training With REINFORCE</h2>
+<p>controller를 학습시키려면 우리는 loss 함수를 정의해야합니다.
+controller에서 만들어진 네트워크를 child network라고 하겠습니다. 
+그리고 child network를 구성하기 위한 action들을 <script type="math/tex">a_{1:T}</script>, 학습된 child network의 validation accuracy를 R이라고 할 때 <script type="math/tex">J(\theta_c)</script>는 다음과 같습니다.</p>
+
+<center>
+$$J(\theta_c)=E_{P(a_{1:T};\theta_c)}[R]$$
+</center>
+
+<p>reward signal인 R은 미분 불가능하기 떄문에 REINFORCE라는 policy로 update를 합니다.
+이는 다음과 같은 식으로 만들 수 있고</p>
+
+<center>
+$$\nabla_{\theta_c} J(\theta_c) = \sum_{t=1}^{T}E_{P(a_1:T; \theta_c)}[\nabla_{\theta_c} logP(a_t | a_{(t-1):1}; theta_c) R]$$  
+</center>
+
+<p>따라서 위의 식은 다음과 같이 근사될 수 있습니다.</p>
+
+<center>
+$$\frac{1}{m} \sum_{k=1}^{m} \sum_{t=1}^{T} \nabla_{\theta_c} logP(a_t | a_{(t-1):1}; {\theta_c}) R_k$$  
+</center>
+
+<p>m은 한 배치에 controller가 만들 child network의 개수이고 k번째 child network의 validation accuracy를 <script type="math/tex">R_k</script>이다.
+위의 식은 불편 추정치이지만 분산이 크기 때문에 분산을 줄이기 위해서 다음과 같은 식을 씁니다.</p>
+
+<center>
+$$\frac{1}{m} \sum_{k=1}^{m} \sum_{t=1}^{T} \nabla_{\theta_c} logP(a_t | a_{(t-1):1}; {\theta_c}) (R_k-b)$$  
+</center>
+
+<p>b는 이전 네트워크들의 validation accuracy의 지수이동평균입니다.</p>
+
+<h2 id="skip-connection">Skip Connection</h2>
+<p>GoogleNet, ResNet같은 네트워크들은 skip connection을 통해 성능을 높힙니다.
+이와 같이 NASNet에서도 skip connection을 생성하기 위해 다음과 같이 설정했습니다.</p>
+
+<p>layer N에서 이전의 layer으로 부터 skip connection이 있는지를 결정하는 N-1개의 content-based sigmoid(anchor point)를 추가합니다.</p>
+
+<center>
+P(Layer j is an input to layer i) = $$sigmoid(v^T tanh(W_{prev} * h_j + W_{curr} * h_i))$$  
+</center>
+
+<p><script type="math/tex">h_j</script>는 j번째 layer의 controller의 hiddenstate이고 그 값은 0 부터 N-1까지 가질 수 있다.</p>
+
+<p><img src="https://user-images.githubusercontent.com/40621030/106002715-cb0f5b00-60f4-11eb-81a2-64e564aabcf0.png" alt="Figure3" /></p>
+
+<p>하지만 이렇게 연결하다보면 구조가 망가지는 경우가 있기 때문에 다음과 같은 규칙을 정한다.</p>
+
+<ol>
+  <li>input layer로 쓴 layer는 다른 layer의 input layer가 되지 않는다.</li>
+  <li>skip connection이 안되어있는 layer를 다 final layer에 connection을 만든다.</li>
+  <li>만약 skip connection시 layer의 size가 다르면 zero padding을 한다.</li>
+</ol>
+
+<h2 id="result">Result</h2>
+<p><img src="https://user-images.githubusercontent.com/40621030/106003536-a49def80-60f5-11eb-8f93-49d8ff7bc92f.png" alt="Table1" /></p>
+
+<h2 id="opinion">Opinion</h2>
+<p>손수 만든 네트워크들에 비해 그렇게까지 정확도가 높다고 말할 수는 없지만 그래도 AutoML로 만들었다는 것에 의의가 있는 것 같습니다.
+그리고 실험결과를 볼 때 filter들은 직사각형이 많다라는 말이 있는데 무작위로 뽑아도 직사각형이 될 확률이 높아서 그렇지 않을까 생각합니다.</p>
+
+  </div>
+
+  <div class="date">
+    <i class="fa fa-calendar fa-fw" aria-hidden="true"></i>&nbsp;Date:<span style="color: #333333; font-weight: normal;">&nbsp;January 27, 2021</span>
+  </div>
+
+  <div class="post-categories">
+    <i class="fa fa-tags fa-fw" aria-hidden="true"></i>&nbsp;Tags:&nbsp;
+      
+      
+      <a class="categories-button"<a href="/categories/#Computer Vision">Computer Vision</a>
+      
+      
+      <a class="categories-button"<a href="/categories/#Neural Architecture Search">Neural Architecture Search</a>
+      
+      
+  </div>
+
+  <div class="share-post">
+    <i class="fa fa-share-alt-square fa-fw" aria-hidden="true"></i>&nbsp;Share:&nbsp;
+    <!-- Sharingbutton Facebook -->
+<a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/" title="Share on Facebook" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton Twitter -->
+<a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?text=[AutoML] NASNet&amp;url=http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/" title="Share on Twitter" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--twitter resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M23.44 4.83c-.8.37-1.5.38-2.22.02.93-.56.98-.96 1.32-2.02-.88.52-1.86.9-2.9 1.1-.82-.88-2-1.43-3.3-1.43-2.5 0-4.55 2.04-4.55 4.54 0 .36.03.7.1 1.04-3.77-.2-7.12-2-9.36-4.75-.4.67-.6 1.45-.6 2.3 0 1.56.8 2.95 2 3.77-.74-.03-1.44-.23-2.05-.57v.06c0 2.2 1.56 4.03 3.64 4.44-.67.2-1.37.2-2.06.08.58 1.8 2.26 3.12 4.25 3.16C5.78 18.1 3.37 18.74 1 18.46c2 1.3 4.4 2.04 6.97 2.04 8.35 0 12.92-6.92 12.92-12.93 0-.2 0-.4-.02-.6.9-.63 1.96-1.22 2.56-2.14z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton Tumblr -->
+<a class="resp-sharing-button__link" href="https://www.tumblr.com/widgets/share/tool?posttype=link&amp;title=[AutoML] NASNet&amp;content=http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/&amp;canonicalUrl=http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/&amp;shareSource=tumblr_share_button" title="Share on Tumblr" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--tumblr resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.5.5v5h5v4h-5V15c0 5 3.5 4.4 6 2.8v4.4c-6.7 3.2-12 0-12-4.2V9.5h-3V6.7c1-.3 2.2-.7 3-1.3.5-.5 1-1.2 1.4-2 .3-.7.6-1.7.7-3h3.8z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton E-Mail -->
+<a class="resp-sharing-button__link" href="mailto:?subject=[AutoML] NASNet&body=You can read more at this site%2C%0Ahttp://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/" title="Share via E-Mail" target="_self" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--email resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 4H2C.9 4 0 4.9 0 6v12c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM7.25 14.43l-3.5 2c-.08.05-.17.07-.25.07-.17 0-.34-.1-.43-.25-.14-.24-.06-.55.18-.68l3.5-2c.24-.14.55-.06.68.18.14.24.06.55-.18.68zm4.75.07c-.1 0-.2-.03-.27-.08l-8.5-5.5c-.23-.15-.3-.46-.15-.7.15-.22.46-.3.7-.14L12 13.4l8.23-5.32c.23-.15.54-.08.7.15.14.23.07.54-.16.7l-8.5 5.5c-.08.04-.17.07-.27.07zm8.93 1.75c-.1.16-.26.25-.43.25-.08 0-.17-.02-.25-.07l-3.5-2c-.24-.13-.32-.44-.18-.68s.44-.32.68-.18l3.5 2c.24.13.32.44.18.68z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton Pinterest -->
+<a class="resp-sharing-button__link" href="https://pinterest.com/pin/create/button/?url=http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/&amp;media=http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/&amp;description=[AutoML] NASNet" title="Share on Pinterest" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--pinterest resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12.14.5C5.86.5 2.7 5 2.7 8.75c0 2.27.86 4.3 2.7 5.05.3.12.57 0 .66-.33l.27-1.06c.1-.32.06-.44-.2-.73-.52-.62-.86-1.44-.86-2.6 0-3.33 2.5-6.32 6.5-6.32 3.55 0 5.5 2.17 5.5 5.07 0 3.8-1.7 7.02-4.2 7.02-1.37 0-2.4-1.14-2.07-2.54.4-1.68 1.16-3.48 1.16-4.7 0-1.07-.58-1.98-1.78-1.98-1.4 0-2.55 1.47-2.55 3.42 0 1.25.43 2.1.43 2.1l-1.7 7.2c-.5 2.13-.08 4.75-.04 5 .02.17.22.2.3.1.14-.18 1.82-2.26 2.4-4.33.16-.58.93-3.63.93-3.63.45.88 1.8 1.65 3.22 1.65 4.25 0 7.13-3.87 7.13-9.05C20.5 4.15 17.18.5 12.14.5z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton LinkedIn -->
+<a class="resp-sharing-button__link" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/&amp;title=[AutoML] NASNet&amp;summary=[AutoML] NASNet&amp;source=http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/" title="Share on LinkedIn" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--linkedin resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6.5 21.5h-5v-13h5v13zM4 6.5C2.5 6.5 1.5 5.3 1.5 4s1-2.4 2.5-2.4c1.6 0 2.5 1 2.6 2.5 0 1.4-1 2.5-2.6 2.5zm11.5 6c-1 0-2 1-2 2v7h-5v-13h5V10s1.6-1.5 4-1.5c3 0 5 2.2 5 6.3v6.7h-5v-7c0-1-1-2-2-2z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton Reddit -->
+<a class="resp-sharing-button__link" href="https://reddit.com/submit/?url=http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/&amp;resubmit=true&amp;title=[AutoML] NASNet" title="Share on Reddit" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--reddit resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M24 11.5c0-1.65-1.35-3-3-3-.96 0-1.86.48-2.42 1.24-1.64-1-3.75-1.64-6.07-1.72.08-1.1.4-3.05 1.52-3.7.72-.4 1.73-.24 3 .5C17.2 6.3 18.46 7.5 20 7.5c1.65 0 3-1.35 3-3s-1.35-3-3-3c-1.38 0-2.54.94-2.88 2.22-1.43-.72-2.64-.8-3.6-.25-1.64.94-1.95 3.47-2 4.55-2.33.08-4.45.7-6.1 1.72C4.86 8.98 3.96 8.5 3 8.5c-1.65 0-3 1.35-3 3 0 1.32.84 2.44 2.05 2.84-.03.22-.05.44-.05.66 0 3.86 4.5 7 10 7s10-3.14 10-7c0-.22-.02-.44-.05-.66 1.2-.4 2.05-1.54 2.05-2.84zM2.3 13.37C1.5 13.07 1 12.35 1 11.5c0-1.1.9-2 2-2 .64 0 1.22.32 1.6.82-1.1.85-1.92 1.9-2.3 3.05zm3.7.13c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm9.8 4.8c-1.08.63-2.42.96-3.8.96-1.4 0-2.74-.34-3.8-.95-.24-.13-.32-.44-.2-.68.15-.24.46-.32.7-.18 1.83 1.06 4.76 1.06 6.6 0 .23-.13.53-.05.67.2.14.23.06.54-.18.67zm.2-2.8c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm5.7-2.13c-.38-1.16-1.2-2.2-2.3-3.05.38-.5.97-.82 1.6-.82 1.1 0 2 .9 2 2 0 .84-.53 1.57-1.3 1.87z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton XING -->
+<a class="resp-sharing-button__link" href="https://www.xing.com/app/user?op=share;http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/;title=[AutoML] NASNet" title="Share on XING" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--xing resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10.2 9.7l-3-5.4C7.2 4 7 4 6.8 4h-5c-.3 0-.4 0-.5.2v.5L4 10 .4 16v.5c0 .2.2.3.4.3h5c.3 0 .4 0 .5-.2l4-6.6v-.5zM24 .2l-.5-.2H18s-.2 0-.3.3l-8 14v.4l5.2 9c0 .2 0 .3.3.3h5.4s.3 0 .4-.2c.2-.2.2-.4 0-.5l-5-8.8L24 .7V.2z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton WhatsApp -->
+<a class="resp-sharing-button__link" href="whatsapp://send?text=[AutoML] NASNet%20http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/" title="Share via WhatsApp" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--whatsapp resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.1 3.9C17.9 1.7 15 .5 12 .5 5.8.5.7 5.6.7 11.9c0 2 .5 3.9 1.5 5.6L.6 23.4l6-1.6c1.6.9 3.5 1.3 5.4 1.3 6.3 0 11.4-5.1 11.4-11.4-.1-2.8-1.2-5.7-3.3-7.8zM12 21.4c-1.7 0-3.3-.5-4.8-1.3l-.4-.2-3.5 1 1-3.4L4 17c-1-1.5-1.4-3.2-1.4-5.1 0-5.2 4.2-9.4 9.4-9.4 2.5 0 4.9 1 6.7 2.8 1.8 1.8 2.8 4.2 2.8 6.7-.1 5.2-4.3 9.4-9.5 9.4zm5.1-7.1c-.3-.1-1.7-.9-1.9-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.1-.2.2-.3.2-.6.1s-1.2-.5-2.3-1.4c-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6s.3-.3.4-.5c.2-.1.3-.3.4-.5.1-.2 0-.4 0-.5C10 9 9.3 7.6 9 7c-.1-.4-.4-.3-.5-.3h-.6s-.4.1-.7.3c-.3.3-1 1-1 2.4s1 2.8 1.1 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.3-.3-.4-.6-.5z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton Hacker News -->
+<a class="resp-sharing-button__link" href="https://news.ycombinator.com/submitlink?u=http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/&amp;t=[AutoML] NASNet" title="Share on Hacker News" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--hackernews resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><path fill-rule="evenodd" d="M60.94 82.314L17 0h20.08l25.85 52.093c.397.927.86 1.888 1.39 2.883.53.994.995 2.02 1.393 3.08.265.4.463.764.596 1.095.13.334.262.63.395.898.662 1.325 1.26 2.618 1.79 3.877.53 1.26.993 2.42 1.39 3.48 1.06-2.254 2.22-4.673 3.48-7.258 1.26-2.585 2.552-5.27 3.877-8.052L103.49 0h18.69L77.84 83.308v53.087h-16.9v-54.08z"></path></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton VK -->
+<a class="resp-sharing-button__link" href="http://vk.com/share.php?title=[AutoML] NASNet&amp;url=http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/" title="Share on VK" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--vk resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.547 7h-3.29a.743.743 0 0 0-.655.392s-1.312 2.416-1.734 3.23C14.734 12.813 14 12.126 14 11.11V7.603A1.104 1.104 0 0 0 12.896 6.5h-2.474a1.982 1.982 0 0 0-1.75.813s1.255-.204 1.255 1.49c0 .42.022 1.626.04 2.64a.73.73 0 0 1-1.272.503 21.54 21.54 0 0 1-2.498-4.543.693.693 0 0 0-.63-.403h-2.99a.508.508 0 0 0-.48.685C3.005 10.175 6.918 18 11.38 18h1.878a.742.742 0 0 0 .742-.742v-1.135a.73.73 0 0 1 1.23-.53l2.247 2.112a1.09 1.09 0 0 0 .746.295h2.953c1.424 0 1.424-.988.647-1.753-.546-.538-2.518-2.617-2.518-2.617a1.02 1.02 0 0 1-.078-1.323c.637-.84 1.68-2.212 2.122-2.8.603-.804 1.697-2.507.197-2.507z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton Telegram -->
+<a class="resp-sharing-button__link" href="https://telegram.me/share/url?text=[AutoML] NASNet&amp;url=http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/" title="Share via Telegram" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--telegram resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M.707 8.475C.275 8.64 0 9.508 0 9.508s.284.867.718 1.03l5.09 1.897 1.986 6.38a1.102 1.102 0 0 0 1.75.527l2.96-2.41a.405.405 0 0 1 .494-.013l5.34 3.87a1.1 1.1 0 0 0 1.046.135 1.1 1.1 0 0 0 .682-.803l3.91-18.795A1.102 1.102 0 0 0 22.5.075L.706 8.475z"/></svg>
+    </div>
+  </div>
+</a>
+
+  </div>
+
+  <div class="related-posts">
+    <div class="related-posts">
+<span class="related-posts-heading">Related Posts:</span><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+
+
+
+  
+    <div class="related-posts-post">
+  <a href="/computer%20vision/knowledge%20distillation/2022/05/09/fitnet/">
+    FitNet
+  </a>
+</div>
+
+
+    
+  
+
+  
+
+  
+    <div class="related-posts-post">
+  <a href="/osam/computer%20vision/2021/10/29/osam-2/">
+    [OSAM] 2. computer vision 개발 과정
+  </a>
+</div>
+
+
+    
+  
+
+  
+
+  
+
+  
+
+  
+    <div class="related-posts-post">
+  <a href="/computer%20vision/2021/01/10/SENet/">
+    학부생이 본 SENet
+  </a>
+</div>
+
+
+    
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+
+
+
+
+
+</div>
+
+  </div>
+
+  <div class="post-nav">
+    <div class="post-nav">
+  <p>
+    
+    <span class="post-nav-label">Previous</span><br>
+    <a href="/data%20structure/python/2021/01/10/heapq-vs-priority-q/">&#9194;&nbsp;[Python] 우선순위 큐 (heapq vs priority queue)</a>
+    
+  </p>
+  <p>
+    
+    <span class="post-nav-label">Next</span><br>
+    <a href="/osam/2021/10/29/osam-1/">[OSAM] 1. 팀 결정 및 주제&시스템 설계&nbsp;&#9193;</a>
+    
+  </p>
+</div>
+
+  </div>
+
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer"><div class="copyright">
+            
+            <p>&copy; 2022 Playground of Wonbeomjang. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/forever-jekyll/forever-jekyll" rel="nofollow">Forever Jekyll</a>.</p>
+            
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <script defer src="https://cdn.plyr.io/3.6.5/plyr.js"></script>
+    <script>
+      const player = new Plyr("#player", { noCookie: true, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1, playsinline: 1 , enablejsapi: 1, autoplay: 0, focused: true, global: false });
+      window.player = player;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
+    <script type="text/javascript">
+      const lightbox = GLightbox({
+          touchNavigation: true,
+          loop: true,
+          autoplayVideos: true
+      });
+    </script>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.js" integrity="sha384-GxNFqL3r9uRJQhR+47eDxuPoNE7yLftQM8LcxzgS4HT73tp970WS/wV5p8UzCOmb" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/auto-render.min.js"
+            onload="renderMathInElement(document.body,{
+                    delimiters: [
+                    { left: '$$',  right: '$$',  display: true  },
+                    { left: '$',   right: '$',   display: false },
+                    { left: '\\[', right: '\\]', display: true  },
+                    { left: '\\(', right: '\\)', display: false }
+                    ]});">
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+    <script>
+      function addDarkmodeWidget() {
+        new Darkmode().showWidget();
+        window.addEventListener('load', addDarkmodeWidget);
+      }
+      const options = {
+        label: '🌓',
+      }
+      const darkmode = new Darkmode(options);
+            darkmode.showWidget();
+    </script>
+  <script data-goatcounter="https://jtiger958.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+  </body>
+</html>

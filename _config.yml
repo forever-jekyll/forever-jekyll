@@ -6,11 +6,7 @@
 lang: "en"
 
 # Name of your site (displayed in the header)
-<<<<<<< HEAD
-name: Playground of Wonbeomjang
-=======
-title: Forever Jekyll
->>>>>>> 45c71bfe985926f5fe48517d42bebfd3fcad06ab
+title: Playground of Wonbeomjang
 
 # Short bio or description (displayed in the header)
 description: undergraduated conputer vision researcher

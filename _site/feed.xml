@@ -1,0 +1,929 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" hreflang="en" /><updated>2022-05-09T20:25:49+09:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Playground of Wonbeomjang</title><subtitle>undergraduated conputer vision researcher</subtitle><entry><title type="html">FitNet</title><link href="http://localhost:4000/computer%20vision/knowledge%20distillation/2022/05/09/fitnet/" rel="alternate" type="text/html" title="FitNet" /><published>2022-05-09T18:50:11+09:00</published><updated>2022-05-09T18:50:11+09:00</updated><id>http://localhost:4000/computer%20vision/knowledge%20distillation/2022/05/09/fitnet</id><content type="html" xml:base="http://localhost:4000/computer%20vision/knowledge%20distillation/2022/05/09/fitnet/">&lt;p&gt;&lt;a href=&quot;https://arxiv.org/abs/1412.6550&quot;&gt;fitnet 논문 링크&lt;/a&gt; &lt;br /&gt;
+많이 쓰이는 딥러닝 모델은 inference time에 많은 시간이 소요된다. 그리고 파라미터 수가 많아서 많은 메모리도 필요하다.
+이러한 이유로 Knowledge Distillation을 사용한다.
+하지만 이전의 연구들은 더 얕은 네트워크에 적용하지 않아 속도면에서 아쉬운 점이 있었다.
+따라서 이 논문에서 더 얕은 네트워크를 사용하여 compression하는 방법을 제공한다.&lt;/p&gt;
+
+&lt;h2 id=&quot;method&quot;&gt;Method&lt;/h2&gt;
+&lt;h3 id=&quot;review-of-knowledge-distillation&quot;&gt;Review of Knowledge Distillation&lt;/h3&gt;
+
+&lt;p&gt;이전 연구(Hinton &amp;amp; din, 2014)에선 student network가 학습할 때 제공된 label뿐만 아니라 teacher network의 output까지 학습하게 한다.
+&lt;script type=&quot;math/tex&quot;&gt;P_T&lt;/script&gt;는 teacher의 output, &lt;script type=&quot;math/tex&quot;&gt;P_S&lt;/script&gt;는 student의 output이라 하자.
+또한 &lt;script type=&quot;math/tex&quot;&gt;P_T&lt;/script&gt;는 true label과 유사하기 떄문에 τ를 사용하여 soften시킨다.&lt;/p&gt;
+
+&lt;center&gt;
+$$P^{\tau}_T=softmax(a_T/\tau), P^{\tau}_S=softmax(a_S/\tau)$$  
+&lt;/center&gt;
+
+&lt;p&gt;student network는 다음을 최적화하는 것이 목표이다.&lt;/p&gt;
+&lt;center&gt;
+$$L_{KD}(W_S)=H(y_{true}, P_S) + \lambda H(P^{\tau}_T, P^{\tau}_S)$$  
+&lt;/center&gt;
+
+&lt;p&gt;H는 cross entropy이고, λ는 두 cross entropy의 균형을 맞추는 hyper parameter이다.&lt;/p&gt;
+
+&lt;h3 id=&quot;hint-based-training&quot;&gt;Hint based Training&lt;/h3&gt;
+&lt;p&gt;저자는 DNN을 학습시키기 위해 hint와 guide layer라는 것을 도입했다. hint는 student의 학습을 도와주기 위한 teacher의 hidden layer이다. 
+또한 guide layer는 teacher의 hint layer로부터 배우는 student의 hidden layer이다.
+저자는 guide layer가 teacher의 hint layer를 학습하도록 목표를 잡았다.
+이때 hint layer와 guide layer는 teacher와 studnet의 middle layer로 설정했다.
+그리고 guide layer는 hint와 차원이 맞지 않기 떄문에 regression layer를 추가했다.&lt;/p&gt;
+
+&lt;center&gt;
+$$L_{HT}(W_{Guided}, W_r) = 1/2||u_h(x;W_{Hint}) - r(v_g(x;W_{Guided}); W_r)||^2$$  
+&lt;/center&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;u_h, v_g&lt;/script&gt;는 각각teacher와 student의 nested funsiton이고 &lt;script type=&quot;math/tex&quot;&gt;W_{Hint}, W_{Guided}&lt;/script&gt;는 teacher와 student의 parameter이다.&lt;/p&gt;
+
+&lt;p&gt;regression layer를 fully connected layer로 설정할 수 있지만 파라미터수가 많아지므로 cnn layer를 사용하여
+&lt;script type=&quot;math/tex&quot;&gt;N_{h,1} \times N_{h,2} \times O_{h} \times N_{g,1} \times N_{g,2} \times O_{g}&lt;/script&gt; 에서 &lt;script type=&quot;math/tex&quot;&gt;k_1 \times k_2 \times O_{h} \times O_{g}&lt;/script&gt;로 줄일 수 있었다.&lt;/p&gt;
+
+&lt;h3 id=&quot;training-method&quot;&gt;Training Method&lt;/h3&gt;
+&lt;p&gt;FitNet(논문에서 제안한 방법으로 학습된 네트워크)은 teacher가 student를 가르치는 방법으로 다음과 같이 직관적인 학습과정을 거친다.
+&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/167399813-49155f46-ad13-47ea-baca-3f4ddcfa7f49.png&quot; alt=&quot;Figure1&quot; /&gt;&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;학습된 teacher network와 random initialized된 student network를 준비한다.&lt;/li&gt;
+  &lt;li&gt;hint와 guide layer를 가지고 regressor를 학습시킨다.&lt;/li&gt;
+  &lt;li&gt;hint와 regressor를 사용해 guide를 학습시킨다. 이 때 studnet의 학습이 일어난다.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;이에대한 알고리즘은 다음과 같다.
+&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/167399823-c6670e51-a34b-43a6-835c-81ffddb5bda5.png&quot; alt=&quot;Algorithm1&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;result&quot;&gt;Result&lt;/h3&gt;
+&lt;p&gt;결과는 다음과 같다.
+&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/167399991-3448ef8f-7f06-4229-9aba-47198f22a660.png&quot; alt=&quot;Table1&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;느낀점&quot;&gt;느낀점&lt;/h3&gt;
+&lt;p&gt;feature map base로 학습시킨다는 의도는 좋았다. 많은 논문이 이를 따른다는 것에 의미가 있다. 하지만 regressor를 따로 학습시킨다는 것에 의문이 든다.
+regressor를 학습시킬떄는 teacher는 의미있는 representation이 있지만 student는 의미있는 representation을 가지고 있지 않다. 
+따라서 각각의 representation space의 변환이 적절하게 되었는지는 의문이다.&lt;/p&gt;</content><author><name></name></author><summary type="html">fitnet 논문 링크 많이 쓰이는 딥러닝 모델은 inference time에 많은 시간이 소요된다. 그리고 파라미터 수가 많아서 많은 메모리도 필요하다. 이러한 이유로 Knowledge Distillation을 사용한다. 하지만 이전의 연구들은 더 얕은 네트워크에 적용하지 않아 속도면에서 아쉬운 점이 있었다. 따라서 이 논문에서 더 얕은 네트워크를 사용하여 compression하는 방법을 제공한다. Method Review of Knowledge Distillation 이전 연구(Hinton &amp;amp; din, 2014)에선 student network가 학습할 때 제공된 label뿐만 아니라 teacher network의 output까지 학습하게 한다. 는 teacher의 output, 는 student의 output이라 하자. 또한 는 true label과 유사하기 떄문에 τ를 사용하여 soften시킨다. $$P^{\tau}_T=softmax(a_T/\tau), P^{\tau}_S=softmax(a_S/\tau)$$ student network는 다음을 최적화하는 것이 목표이다. $$L_{KD}(W_S)=H(y_{true}, P_S) + \lambda H(P^{\tau}_T, P^{\tau}_S)$$ H는 cross entropy이고, λ는 두 cross entropy의 균형을 맞추는 hyper parameter이다. Hint based Training 저자는 DNN을 학습시키기 위해 hint와 guide layer라는 것을 도입했다. hint는 student의 학습을 도와주기 위한 teacher의 hidden layer이다. 또한 guide layer는 teacher의 hint layer로부터 배우는 student의 hidden layer이다. 저자는 guide layer가 teacher의 hint layer를 학습하도록 목표를 잡았다. 이때 hint layer와 guide layer는 teacher와 studnet의 middle layer로 설정했다. 그리고 guide layer는 hint와 차원이 맞지 않기 떄문에 regression layer를 추가했다. $$L_{HT}(W_{Guided}, W_r) = 1/2||u_h(x;W_{Hint}) - r(v_g(x;W_{Guided}); W_r)||^2$$ 는 각각teacher와 student의 nested funsiton이고 는 teacher와 student의 parameter이다. regression layer를 fully connected layer로 설정할 수 있지만 파라미터수가 많아지므로 cnn layer를 사용하여 에서 로 줄일 수 있었다. Training Method FitNet(논문에서 제안한 방법으로 학습된 네트워크)은 teacher가 student를 가르치는 방법으로 다음과 같이 직관적인 학습과정을 거친다. 학습된 teacher network와 random initialized된 student network를 준비한다. hint와 guide layer를 가지고 regressor를 학습시킨다. hint와 regressor를 사용해 guide를 학습시킨다. 이 때 studnet의 학습이 일어난다. 이에대한 알고리즘은 다음과 같다. Result 결과는 다음과 같다. 느낀점 feature map base로 학습시킨다는 의도는 좋았다. 많은 논문이 이를 따른다는 것에 의미가 있다. 하지만 regressor를 따로 학습시킨다는 것에 의문이 든다. regressor를 학습시킬떄는 teacher는 의미있는 representation이 있지만 student는 의미있는 representation을 가지고 있지 않다. 따라서 각각의 representation space의 변환이 적절하게 되었는지는 의문이다.</summary></entry><entry><title type="html">[OSAM] 3. 이제 끝나는 건가?</title><link href="http://localhost:4000/osam/2021/11/11/osam-3/" rel="alternate" type="text/html" title="[OSAM] 3. 이제 끝나는 건가?" /><published>2021-11-11T18:50:11+09:00</published><updated>2021-11-11T18:50:11+09:00</updated><id>http://localhost:4000/osam/2021/11/11/osam-3</id><content type="html" xml:base="http://localhost:4000/osam/2021/11/11/osam-3/">&lt;p&gt;해커톤이 끝나간다. 그런데 프론트는 아직 안 끝났고 결과물 제출 일주일 전에 갑자기 인스타그램 연동, 지속적인 학습 및 모델 업데이트, 로그를 넣자고 한다.
+나는 반대했지만 우리와 비슷한 아이디어를 가진 다른팀이 있어 다수의 의견대로 진행하기로 했다.&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/86545225/137576790-1e7b5459-fdbd-4cc8-9e3b-d27a3bd3b1b4.jpg&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;그렇게 로그를 추가하고…&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/141277496-ceffd608-0249-485a-8cd0-3118a97544bd.PNG&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;인스타봇을 추가하고…&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/137886632-edd9ca08-831e-4b29-97da-62b6bae0982b.PNG&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;대충 이런 REST API서버를 장고로 만들고…&lt;/p&gt;
+
+&lt;p&gt;이제 진짜 끝났다.&lt;/p&gt;
+
+&lt;h2 id=&quot;이제-진짜-끝&quot;&gt;이제 진짜 끝&lt;/h2&gt;
+
+&lt;table&gt;
+ &lt;tr&gt;
+  &lt;td align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/86545225/137917096-372ec2f3-60ab-4e49-ab98-cb87ca96aa88.PNG&quot; width=&quot;200&quot; /&gt;&lt;/td&gt;
+  &lt;td align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/86545225/137917134-a9d63375-3663-467a-8ea3-2d5a92950085.PNG&quot; width=&quot;200&quot; /&gt;&lt;/td&gt;
+  &lt;td align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/86545225/137917734-1f88e1c0-5f2f-4f2e-a7f5-d3ddb3019b81.png&quot; width=&quot;200&quot; /&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+
+ &lt;tr&gt;
+  &lt;td align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/86545225/137917171-afe0567c-4cc5-4bf7-84dd-862c1cec4819.PNG&quot; width=&quot;200&quot; /&gt;&lt;/td&gt;
+  &lt;td align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/86545225/137919288-c90a06c7-c843-407f-ba5e-aed914cf3fd5.PNG&quot; width=&quot;200&quot; /&gt;&lt;/td&gt;
+  &lt;td align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/86545225/137919350-567523d8-255e-466a-a834-12014eeb4679.PNG&quot; width=&quot;200&quot; /&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+
+ &lt;tr&gt;
+  &lt;td align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/86545225/137919337-f2109767-9daa-427d-85f7-2dad831202db.png&quot; width=&quot;200&quot; /&gt;&lt;/td&gt;
+  &lt;td align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/86545225/137919583-8a2fd884-c0c3-4bfb-8099-aeb03b7ce081.png&quot; width=&quot;200&quot; /&gt;&lt;/td&gt;
+  &lt;td align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/86545225/137919328-6390d7ea-207c-49c9-a0b8-97c4eab44d47.PNG&quot; width=&quot;200&quot; /&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+&lt;table&gt;
+  
+**어플 완성!!!!**  
+
+제출 2일전에 드디어 완성시키고 그 다음 문서를 작성했다. 주최측에서 [레포지토리](https://github.com/osamhack2021/AI_APP_WEB_Canary_Canary) [README](https://github.com/osamhack2021/AI_APP_WEB_Canary_Canary)로 개발문서를 만들라고 해서 README에 문서를 떄려 박았다.
+
+
+[github readme](https://github.com/osamhack2021/AI_APP_WEB_Canary_Canary), 
+[ppt](https://docs.google.com/presentation/d/1s4Sa52awVV3G2vbk3Qd4I2jI2PlZm4a3-0RNrLDudvI/edit?usp=sharing)
+
+## 결과
+11월 8일 최종결과 발표였는데 국방부 승인이 나지 않아서 11월 11일에 나왔다.
+결과는 두구둑두구....  
+  
+&lt;p align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/141281402-ad7c28a5-3032-4564-a7f8-e7cf00cb7fa0.PNG&quot; /&gt;&lt;/p&gt;  
+
+해군참모총장상을 받았다. 8등 정도 한 것 같았는데 아쉬웠지만 다들 프로젝트를 처음한다고 하니까 다행이라 생각한다.
+5주 동안 고생한 나에게 박수를!!!!
+&lt;/table&gt;&lt;/table&gt;</content><author><name></name></author><summary type="html">해커톤이 끝나간다. 그런데 프론트는 아직 안 끝났고 결과물 제출 일주일 전에 갑자기 인스타그램 연동, 지속적인 학습 및 모델 업데이트, 로그를 넣자고 한다. 나는 반대했지만 우리와 비슷한 아이디어를 가진 다른팀이 있어 다수의 의견대로 진행하기로 했다. 그렇게 로그를 추가하고… 인스타봇을 추가하고… 대충 이런 REST API서버를 장고로 만들고… 이제 진짜 끝났다. 이제 진짜 끝 **어플 완성!!!!** 제출 2일전에 드디어 완성시키고 그 다음 문서를 작성했다. 주최측에서 [레포지토리](https://github.com/osamhack2021/AI_APP_WEB_Canary_Canary) [README](https://github.com/osamhack2021/AI_APP_WEB_Canary_Canary)로 개발문서를 만들라고 해서 README에 문서를 떄려 박았다. [github readme](https://github.com/osamhack2021/AI_APP_WEB_Canary_Canary), [ppt](https://docs.google.com/presentation/d/1s4Sa52awVV3G2vbk3Qd4I2jI2PlZm4a3-0RNrLDudvI/edit?usp=sharing) ## 결과 11월 8일 최종결과 발표였는데 국방부 승인이 나지 않아서 11월 11일에 나왔다. 결과는 두구둑두구.... 해군참모총장상을 받았다. 8등 정도 한 것 같았는데 아쉬웠지만 다들 프로젝트를 처음한다고 하니까 다행이라 생각한다. 5주 동안 고생한 나에게 박수를!!!!</summary></entry><entry><title type="html">[OSAM] 2. computer vision 개발 과정</title><link href="http://localhost:4000/osam/computer%20vision/2021/10/29/osam-2/" rel="alternate" type="text/html" title="[OSAM] 2. computer vision 개발 과정" /><published>2021-10-29T18:50:11+09:00</published><updated>2021-10-29T18:50:11+09:00</updated><id>http://localhost:4000/osam/computer%20vision/2021/10/29/osam-2</id><content type="html" xml:base="http://localhost:4000/osam/computer%20vision/2021/10/29/osam-2/">&lt;p&gt;이 포스트는 이전 포스트를 읽으면 이해하기 더 쉽다.&lt;br /&gt;
+&lt;a href=&quot;https://wonbeomjang.github.io/2021/10/29/osam-1/&quot;&gt;[OSAM] 1. 팀 결정 및 주제&amp;amp;시스템 설계&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Object Detection 모델을 선택하는데 몇 가지 기준을 세웠다.&lt;/p&gt;
+
+&lt;p&gt;1 . model train과 evaluation이 빨라야 한다.&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;memory를 적게 잡아먹어야 한다.&lt;/li&gt;
+  &lt;li&gt;성능이 나쁘지 않아야 한다.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;그렇게 SSD, SSDLite, EfficientNet, YOLOv5가 후보에 올랐다.
+EfficientNet은 학습시간이 너무 오래걸렸고, SSD는 성능이 매우 낮아 YOLOv5를 선택했다.&lt;/p&gt;
+
+&lt;h2 id=&quot;dataset준비&quot;&gt;Dataset준비&lt;/h2&gt;
+&lt;p&gt;우리가 만들 모델은 군사 시설, 장비, 용품 등을 인식하는 문제였다.
+데이테셋을 찾아보려고 해도 우리가 원하는 데이터를 찾기 어려웠다.
+하지만 다행이 kaggle에 &lt;a href=&quot;https://www.kaggle.com/c/imagenet-object-localization-challenge&quot;&gt;ImageNet Object Localization Challenge&lt;/a&gt;가 있었고, 
+이 데이터 + 직접 크롤링한 데이터를 이용하기로 했다.&lt;/p&gt;
+
+&lt;h2 id=&quot;모델-학습&quot;&gt;모델 학습&lt;/h2&gt;
+&lt;p align=&quot;center&quot;&gt;&lt;img src=&quot;https://miro.medium.com/max/568/1*dXqFj2sY7zWXddWdKPuQng.png&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;일단 다들 알다싶이 precision과 recall은 trade off관계에 있다.
+그리고 앞에서 말했 듯 우리가 만들고자 하는 것은 군사보안에 관한 것이다.
+물체가 잘못 인식되어서 모자이크가 잘못 쳐지는 것 보다 군관련 사항을 모자이크를 못 하는 것이 치명적인 오류이다.
+따라서 평가지표를 recall로 잡고 개발을 진행하기로 했다.
+먼저 vanilla yolov5를 이용하여 학습을 진행했고 다음과 같은 결과가 나왔다.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;enhance&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;model&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;precision&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;recall&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;mAP_0.5&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;mAP_0.5:0.95&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;Vanilla&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;yolov5m6&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.602&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.651&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.671&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.535&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&quot;문제점-분석&quot;&gt;문제점 분석&lt;/h2&gt;
+&lt;h3 id=&quot;데이터&quot;&gt;데이터&lt;/h3&gt;
+&lt;p align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/137607638-124c1622-6bfe-4a45-a16b-519314916436.jpg&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;1차적으로 만든 데이터셋의 특성이고 다음과 같이 분석했다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;bounding box는 한 class당 500개 정도이다.&lt;/li&gt;
+  &lt;li&gt;bounding box 중심의 위치는 대개 정중앙이다.&lt;/li&gt;
+  &lt;li&gt;bounding box가 이미지의 크거나 대부분을 차지한다.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;모델&quot;&gt;모델&lt;/h3&gt;
+&lt;p&gt;경량모델의 문제점이 그대로 나타났다. 모델이 가벼워 training set에 overfitting이 잘 되었고, 모델 자체의 성능도 낮았다.
+yolov5x6와 같은 같은 계열의 무거운 모델을 쓸 수 있지만 그러면 서비스 자체가 느려질 것이었다&lt;/p&gt;
+
+&lt;h2 id=&quot;해결방법&quot;&gt;해결방법&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;해결방안 1 - 데이터 추가&lt;/strong&gt;&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+   &lt;td align=&quot;center&quot;&gt;Orignal Dataset&lt;/td&gt;
+   &lt;td align=&quot;center&quot;&gt;Add more data&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/137607638-124c1622-6bfe-4a45-a16b-519314916436.jpg&quot; /&gt;&lt;/td&gt;
+   &lt;td align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/137607640-9552448f-a39c-4a46-9d50-a523002be0e4.jpg&quot; /&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+ &lt;/table&gt;
+
+&lt;p&gt;누가 뭐라고 하던 데이터가 많으면 최고다.
+class당 500개의 box는 말도 안되는 개수라 직접 imgenet dataset에서 annotation을 해서 수를 1200개 이상으로 늘렸다.
+그러자 bounding box의 중심도 많이 퍼졌고, small object도 많이 생겨났다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;해결방안 2- augmentation 방법 변경&lt;/strong&gt;&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;tr&gt;
+   &lt;td align=&quot;center&quot;&gt;기존&lt;/td&gt;
+   &lt;td align=&quot;center&quot;&gt;변경&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/137607771-6509a1f3-872a-4bfd-ac0f-389e7dcd8fdc.jpeg&quot; /&gt;&lt;/td&gt;
+   &lt;td align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/137607774-68692b66-5324-4184-ba9a-e41151a6a561.jpeg&quot; /&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+ &lt;/table&gt;
+
+&lt;p&gt;기존 데이터셋의 문제점이 물체의 중심이 이미지 정가운데이고, 물체가 이미지의 대부분을 차지한다 였다.
+이 문제점을 해결하기 위해 yolov5에 있는 mosaic augmentation이 적절했으나 이는 부족했다.
+따라서 우리는 lagacy code에 있는 masaic_9 augmentatio을 사용하기로 했다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;해결방안 3 - knowledge distillation(&lt;a href=&quot;https://arxiv.org/abs/1906.03609&quot;&gt;paper link&lt;/a&gt;)&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/136683028-fb1ca2f0-97c0-4581-9b7a-64e26536d7af.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;경량화 기법 중 하나인 knowledge distillation을 사용했다. 
+yolov5x6를 teacher model로 yolov5m6를 student model로 knowledge distillation을 진행하면 overfitting을 막아주고 성능이 높아 질 것이다&lt;/p&gt;
+
+&lt;h3 id=&quot;결과&quot;&gt;결과&lt;/h3&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;enhance&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;model&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;precision&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;recall&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;mAP_0.5&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;mAP_0.5:0.95&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;Before add dataset&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;yolov5m6&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.602&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.651&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.671&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.535&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;None (Add dataset)&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;yolov5m6&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.736&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.779&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.815&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.599&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;mosaic_9 50%&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;yolov5m6&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.756&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.775&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.809&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.602&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;mosaic_9 100%&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;yolov5m6&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.739&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.813&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.806&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.594&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;knowledge distillation&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;yolov5m6&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.722&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.822&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.807&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;0.592&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;table&gt;
+ &lt;tr&gt;
+  &lt;td align=&quot;center&quot;&gt;Original Image&lt;/td&gt;
+  &lt;td align=&quot;center&quot;&gt;Result Image&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+  &lt;td align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/136698553-a00eb618-7783-41d9-bd2c-203dbbd60946.jpg&quot; /&gt;&lt;/td&gt;
+  &lt;td align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/136698552-42c71108-9efc-4c88-a68a-3f5aec8452c6.jpg&quot; /&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;p&gt;결과적으로 recall이 17.1%p를 올리는 결과를 냈다. recall을 높이기 위해 precision이 조금 낮아졌다는 것이 아쉬였다.
+사용했던 knowledge distillation code는 여기에 있다.
+&lt;a href=&quot;https://github.com/wonbeomjang/yolov5-knowledge-distillation&quot;&gt;yolov5-knowledge-distillation&lt;/a&gt;&lt;/p&gt;</content><author><name></name></author><summary type="html">이 포스트는 이전 포스트를 읽으면 이해하기 더 쉽다. [OSAM] 1. 팀 결정 및 주제&amp;amp;시스템 설계 Object Detection 모델을 선택하는데 몇 가지 기준을 세웠다. 1 . model train과 evaluation이 빨라야 한다. memory를 적게 잡아먹어야 한다. 성능이 나쁘지 않아야 한다. 그렇게 SSD, SSDLite, EfficientNet, YOLOv5가 후보에 올랐다. EfficientNet은 학습시간이 너무 오래걸렸고, SSD는 성능이 매우 낮아 YOLOv5를 선택했다. Dataset준비 우리가 만들 모델은 군사 시설, 장비, 용품 등을 인식하는 문제였다. 데이테셋을 찾아보려고 해도 우리가 원하는 데이터를 찾기 어려웠다. 하지만 다행이 kaggle에 ImageNet Object Localization Challenge가 있었고, 이 데이터 + 직접 크롤링한 데이터를 이용하기로 했다. 모델 학습 일단 다들 알다싶이 precision과 recall은 trade off관계에 있다. 그리고 앞에서 말했 듯 우리가 만들고자 하는 것은 군사보안에 관한 것이다. 물체가 잘못 인식되어서 모자이크가 잘못 쳐지는 것 보다 군관련 사항을 모자이크를 못 하는 것이 치명적인 오류이다. 따라서 평가지표를 recall로 잡고 개발을 진행하기로 했다. 먼저 vanilla yolov5를 이용하여 학습을 진행했고 다음과 같은 결과가 나왔다. enhance model precision recall mAP_0.5 mAP_0.5:0.95 Vanilla yolov5m6 0.602 0.651 0.671 0.535 문제점 분석 데이터 1차적으로 만든 데이터셋의 특성이고 다음과 같이 분석했다. bounding box는 한 class당 500개 정도이다. bounding box 중심의 위치는 대개 정중앙이다. bounding box가 이미지의 크거나 대부분을 차지한다. 모델 경량모델의 문제점이 그대로 나타났다. 모델이 가벼워 training set에 overfitting이 잘 되었고, 모델 자체의 성능도 낮았다. yolov5x6와 같은 같은 계열의 무거운 모델을 쓸 수 있지만 그러면 서비스 자체가 느려질 것이었다 해결방법 해결방안 1 - 데이터 추가 Orignal Dataset Add more data 누가 뭐라고 하던 데이터가 많으면 최고다. class당 500개의 box는 말도 안되는 개수라 직접 imgenet dataset에서 annotation을 해서 수를 1200개 이상으로 늘렸다. 그러자 bounding box의 중심도 많이 퍼졌고, small object도 많이 생겨났다. 해결방안 2- augmentation 방법 변경 기존 변경 기존 데이터셋의 문제점이 물체의 중심이 이미지 정가운데이고, 물체가 이미지의 대부분을 차지한다 였다. 이 문제점을 해결하기 위해 yolov5에 있는 mosaic augmentation이 적절했으나 이는 부족했다. 따라서 우리는 lagacy code에 있는 masaic_9 augmentatio을 사용하기로 했다. 해결방안 3 - knowledge distillation(paper link) 경량화 기법 중 하나인 knowledge distillation을 사용했다. yolov5x6를 teacher model로 yolov5m6를 student model로 knowledge distillation을 진행하면 overfitting을 막아주고 성능이 높아 질 것이다 결과 enhance model precision recall mAP_0.5 mAP_0.5:0.95 Before add dataset yolov5m6 0.602 0.651 0.671 0.535 None (Add dataset) yolov5m6 0.736 0.779 0.815 0.599 mosaic_9 50% yolov5m6 0.756 0.775 0.809 0.602 mosaic_9 100% yolov5m6 0.739 0.813 0.806 0.594 knowledge distillation yolov5m6 0.722 0.822 0.807 0.592 Original Image Result Image 결과적으로 recall이 17.1%p를 올리는 결과를 냈다. recall을 높이기 위해 precision이 조금 낮아졌다는 것이 아쉬였다. 사용했던 knowledge distillation code는 여기에 있다. yolov5-knowledge-distillation</summary></entry><entry><title type="html">[OSAM] 1. 팀 결정 및 주제&amp;amp;시스템 설계</title><link href="http://localhost:4000/osam/2021/10/29/osam-1/" rel="alternate" type="text/html" title="[OSAM] 1. 팀 결정 및 주제&amp;시스템 설계" /><published>2021-10-29T17:50:11+09:00</published><updated>2021-10-29T17:50:11+09:00</updated><id>http://localhost:4000/osam/2021/10/29/osam-1</id><content type="html" xml:base="http://localhost:4000/osam/2021/10/29/osam-1/">&lt;p&gt;군대에서 재미없는 나날을 보내고 있었는데 동아리형으로부터 OSAM에 꼭 나가보라는 이야기를 들었다.
+근데 OSAM이 뭐지??&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/139563256-61f7c62b-e4c9-4d0c-8cf6-7b1efa05699f.PNG&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;오 신기한거다라고 생각하며 참여했다.&lt;/p&gt;
+
+&lt;h2 id=&quot;1차-아이디어&quot;&gt;1차 아이디어&lt;/h2&gt;
+&lt;p&gt;나는 지금까지 computer V\vision을 공부하고 있었기 때문에 관련 주제를 선정했다.
+다들 알다싶이 요즘 군대에선 핸드폰을 쓸 수 있다. 하지만 카메라는 예외이다. 나는 항상 그것이 의문스러웠다. &lt;del&gt;병사는 보안을 위반할 보안도 없는데…&lt;/del&gt;
+아무튼 병사들도 조금은 자유롭게 카메라를 쓸 수  사람을 제외한 모든 부분은 날려버리는 프로그램을 만드려고 했다.&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;&lt;img src=&quot;https://github.com/osamhack2021/APP_WEB_AI_AIMS_MOJIRI/blob/main/AI/images/image5_blurred.jpg?raw=true&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;다른 사람이 만든거지만 이런 느낌이랄까? 그렇게 개발계획서를 작성하고 팀을 모집하다가 메일이 하나 왔다.&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/139563446-f7695d4c-a6e8-41d4-9824-abc5160b1821.PNG&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;처음 메일을 받고 팀을 합칠까 고민을 했고, 비슷한 아이디어라 나중에 평가 받을 때 수상을 못할 확률이 있어서 팀에 합류하기로 했다.&lt;/p&gt;
+
+&lt;h2 id=&quot;2차-아이디어&quot;&gt;2차 아이디어&lt;/h2&gt;
+&lt;p&gt;그렇게 나는 ‘카나리아’팀에 들어갔다. 대충 어플의 컨셉을 말하자면 다음과 같다.&lt;/p&gt;
+
+&lt;h3 id=&quot;카나리아--모두를-위한-군사보안-경보-시스템&quot;&gt;🐤카나리아 : 모두를 위한 군사보안 경보 시스템&lt;/h3&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+&lt;img src=&quot;https://raw.githubusercontent.com/osamhack2021/AI_APP_WEB_Canary_Canary/main/image/canary_2.0.png?token=AJV5HZXFAFMEZ5DCXTQDW5TBRTRPM&quot; alter=&quot;LOGO&quot; /&gt;&lt;br /&gt;
+ &lt;img src=&quot;https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge&amp;amp;logo&quot; /&gt;
+ &lt;a href=&quot;https://github.com/osamhack2021/AI_APP_WEB_Canary_Canary/blob/main/LICENSE&quot;&gt;&lt;img src=&quot;https://img.shields.io/badge/License-GNU GPL v3.0-blue?style=for-the-badge&amp;amp;logo&quot; /&gt;&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;p&gt;Canary는 머신러닝을 활용하여 사진 안의 보안 위반 가능성이 있는 요소를 식별하고, 자동 모자이크 처리를 하고, 이를 사용자에게 경고해주는 통합 보안 경보 시스템입니다. 
+Canary App, Canary in Instagram, Admin logweb으로 구성되어 있으며, 앱에서 처리된 사진에는 QR코드가 들어가 처리 여부를 쉽게 식별할 수 있습니다.&lt;/p&gt;
+
+&lt;h3 id=&quot;️프로젝트-소개&quot;&gt;🗂️프로젝트 소개&lt;/h3&gt;
+&lt;p&gt;본 프로젝트는 사진의 보안 내용을 제거하는 기능과 그러한 기능을 가진 카메라를 제공함으로서,&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;군 내에서 카메라를 사용 가능하게 함&lt;/strong&gt;과 동시에,&lt;/li&gt;
+  &lt;li&gt;SNS에 올릴 사진의 보안 위반 가능성을 경고하여 사용자가 &lt;strong&gt;자발적으로&lt;/strong&gt; 보안을 준수 할 수 있게 합니다.&lt;/li&gt;
+  &lt;li&gt;또 현재 SNS올라가 있는 게시물을 검사를 해 &lt;strong&gt;보안에 대한 경각심&lt;/strong&gt;을 일으킬 수 있습니다.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;기간은 한 달… 한 달안에 끝낼 수 있을까 모르겠지만 최선을 다하면 되겠지 하면서 시작했다.&lt;/p&gt;
+
+&lt;h2 id=&quot;설계&quot;&gt;설계&lt;/h2&gt;
+&lt;p&gt;예상 사용자 설정과 시스템 설계는 전에 만들어 놓은 문서로 때우겠다. &lt;del&gt;이거면 다 알아보겠지 하면서 말이다&lt;/del&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;페르소나&quot;&gt;페르소나&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/134792500-00226c5c-592b-4298-aeb8-fb155704278f.png&quot; alt=&quot;페르소나&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;시나리오&quot;&gt;시나리오&lt;/h3&gt;
+
+&lt;h4 id=&quot;1&quot;&gt;#1&lt;/h4&gt;
+&lt;p&gt;&lt;em&gt;막 자대배치를 받은 안준호 이병. 택배로 스마트폰을 받는다.&lt;/em&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;안준호 이병은 처음으로 어플리케이션을 실행한다. 
+0-1. 군번, 이름, 계급을 입력하여 자신의 정보를 저장한다.&lt;/li&gt;
+  &lt;li&gt;드디어 스마트폰을 받아 두근대는 마음으로 사진을 찍기 위해 어플리케이션을 켠다.&lt;/li&gt;
+  &lt;li&gt;촬영 모드로 들어가서 카메라를 켠 후 생활관 TV를 배경으로 사진을 찍는다.&lt;/li&gt;
+  &lt;li&gt;잠시 후, TV 모니터가 모자이크 된 사진과 함께 경고 문구가 출력된다.&lt;/li&gt;
+  &lt;li&gt;사진 저장 시 사진에 QR코드가 새겨진다. QR코드에는 안준호 이병의 군번이 암호화되어 들어간다.&lt;/li&gt;
+  &lt;li&gt;모자이크가 된 사진을 SNS에 올려 자랑한다.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&quot;2&quot;&gt;#2&lt;/h4&gt;
+&lt;p&gt;&lt;em&gt;긴 군생활을 끝내고 드디어 전역한 최종훈 병장. 같이 전역하는 동기들과 기념 사진을 찍는다.&lt;/em&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;최종훈 병장과 동기들은 부대 앞에서 기념 사진을 촬영한다.&lt;/li&gt;
+  &lt;li&gt;SNS에 이 글을 게시하기 전, 최종훈 병장은 혹시 사진에 군사보안 위반은 없는지 걱정된다.&lt;/li&gt;
+  &lt;li&gt;어플리케이션을 실행한 후, 방금 전 찍은 사진을 갤러리에서 선택한다.&lt;/li&gt;
+  &lt;li&gt;잠시 후, 부대마크와 군 표지판 부분이 모자이크 된 사진과 함께 경고 문구가 출력된다.&lt;/li&gt;
+  &lt;li&gt;사진 저장 시 사진에 QR코드가 새겨진다. QR코드에는 최종훈 병장의 군번이 암호화되어 들어간다.&lt;/li&gt;
+  &lt;li&gt;최종훈 병장은 안심하면서 SNS에 사진을 업로드 한다.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&quot;3&quot;&gt;#3&lt;/h4&gt;
+&lt;p&gt;&lt;em&gt;예비군 유시진 씨. 인스타그램에 올렸던 군대 사진들을 본다.&lt;/em&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;유시진 씨는 인스타그램에 올렸던 훈련 사진을 본다.&lt;/li&gt;
+  &lt;li&gt;옛날 사진을 보던 중, 한 사진에 탱크가 찍힌 것을 본다.&lt;/li&gt;
+  &lt;li&gt;Canary Instagram bot에 이 사진을 검토해 줄 것을 메시지로 요청한다.&lt;/li&gt;
+  &lt;li&gt;잠시 후, 탱크가 모자이크 된 사진과 함께 경고 문구를 메시지로 받는다.&lt;/li&gt;
+  &lt;li&gt;유시진 씨는 SNS 사진을 수정한다.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;시스템 흐름도&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;user-case-diagram&quot;&gt;User-case Diagram&lt;/h3&gt;
+&lt;p align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/134690667-abe8f797-01a8-44db-ae89-ef7809c22d64.png&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;sequence-diagram&quot;&gt;Sequence Diagram&lt;/h3&gt;
+&lt;p align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/136720501-bbe98072-abbc-4797-a0c2-c66771f7e04a.png&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;architecture&quot;&gt;Architecture&lt;/h3&gt;
+&lt;p align=&quot;center&quot;&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/136720255-0456ffd4-4d7d-4d2e-b5c5-09387c5861fa.png&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;시작&quot;&gt;시작&lt;/h2&gt;
+&lt;p&gt;두둥… 이제 개발을 시작한다. 한 달 후 어떻 결과물이 나올까 기대된다.&lt;/p&gt;</content><author><name></name></author><summary type="html">군대에서 재미없는 나날을 보내고 있었는데 동아리형으로부터 OSAM에 꼭 나가보라는 이야기를 들었다. 근데 OSAM이 뭐지?? 오 신기한거다라고 생각하며 참여했다. 1차 아이디어 나는 지금까지 computer V\vision을 공부하고 있었기 때문에 관련 주제를 선정했다. 다들 알다싶이 요즘 군대에선 핸드폰을 쓸 수 있다. 하지만 카메라는 예외이다. 나는 항상 그것이 의문스러웠다. 병사는 보안을 위반할 보안도 없는데… 아무튼 병사들도 조금은 자유롭게 카메라를 쓸 수 사람을 제외한 모든 부분은 날려버리는 프로그램을 만드려고 했다. 다른 사람이 만든거지만 이런 느낌이랄까? 그렇게 개발계획서를 작성하고 팀을 모집하다가 메일이 하나 왔다. 처음 메일을 받고 팀을 합칠까 고민을 했고, 비슷한 아이디어라 나중에 평가 받을 때 수상을 못할 확률이 있어서 팀에 합류하기로 했다. 2차 아이디어 그렇게 나는 ‘카나리아’팀에 들어갔다. 대충 어플의 컨셉을 말하자면 다음과 같다. 🐤카나리아 : 모두를 위한 군사보안 경보 시스템 Canary는 머신러닝을 활용하여 사진 안의 보안 위반 가능성이 있는 요소를 식별하고, 자동 모자이크 처리를 하고, 이를 사용자에게 경고해주는 통합 보안 경보 시스템입니다. Canary App, Canary in Instagram, Admin logweb으로 구성되어 있으며, 앱에서 처리된 사진에는 QR코드가 들어가 처리 여부를 쉽게 식별할 수 있습니다. 🗂️프로젝트 소개 본 프로젝트는 사진의 보안 내용을 제거하는 기능과 그러한 기능을 가진 카메라를 제공함으로서, 군 내에서 카메라를 사용 가능하게 함과 동시에, SNS에 올릴 사진의 보안 위반 가능성을 경고하여 사용자가 자발적으로 보안을 준수 할 수 있게 합니다. 또 현재 SNS올라가 있는 게시물을 검사를 해 보안에 대한 경각심을 일으킬 수 있습니다. 기간은 한 달… 한 달안에 끝낼 수 있을까 모르겠지만 최선을 다하면 되겠지 하면서 시작했다. 설계 예상 사용자 설정과 시스템 설계는 전에 만들어 놓은 문서로 때우겠다. 이거면 다 알아보겠지 하면서 말이다 페르소나 시나리오 #1 막 자대배치를 받은 안준호 이병. 택배로 스마트폰을 받는다. 안준호 이병은 처음으로 어플리케이션을 실행한다. 0-1. 군번, 이름, 계급을 입력하여 자신의 정보를 저장한다. 드디어 스마트폰을 받아 두근대는 마음으로 사진을 찍기 위해 어플리케이션을 켠다. 촬영 모드로 들어가서 카메라를 켠 후 생활관 TV를 배경으로 사진을 찍는다. 잠시 후, TV 모니터가 모자이크 된 사진과 함께 경고 문구가 출력된다. 사진 저장 시 사진에 QR코드가 새겨진다. QR코드에는 안준호 이병의 군번이 암호화되어 들어간다. 모자이크가 된 사진을 SNS에 올려 자랑한다. #2 긴 군생활을 끝내고 드디어 전역한 최종훈 병장. 같이 전역하는 동기들과 기념 사진을 찍는다. 최종훈 병장과 동기들은 부대 앞에서 기념 사진을 촬영한다. SNS에 이 글을 게시하기 전, 최종훈 병장은 혹시 사진에 군사보안 위반은 없는지 걱정된다. 어플리케이션을 실행한 후, 방금 전 찍은 사진을 갤러리에서 선택한다. 잠시 후, 부대마크와 군 표지판 부분이 모자이크 된 사진과 함께 경고 문구가 출력된다. 사진 저장 시 사진에 QR코드가 새겨진다. QR코드에는 최종훈 병장의 군번이 암호화되어 들어간다. 최종훈 병장은 안심하면서 SNS에 사진을 업로드 한다. #3 예비군 유시진 씨. 인스타그램에 올렸던 군대 사진들을 본다. 유시진 씨는 인스타그램에 올렸던 훈련 사진을 본다. 옛날 사진을 보던 중, 한 사진에 탱크가 찍힌 것을 본다. Canary Instagram bot에 이 사진을 검토해 줄 것을 메시지로 요청한다. 잠시 후, 탱크가 모자이크 된 사진과 함께 경고 문구를 메시지로 받는다. 유시진 씨는 SNS 사진을 수정한다. 시스템 흐름도 User-case Diagram Sequence Diagram Architecture 시작 두둥… 이제 개발을 시작한다. 한 달 후 어떻 결과물이 나올까 기대된다.</summary></entry><entry><title type="html">[AutoML] NASNet</title><link href="http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/" rel="alternate" type="text/html" title="[AutoML] NASNet" /><published>2021-01-27T16:41:11+09:00</published><updated>2021-01-27T16:41:11+09:00</updated><id>http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet</id><content type="html" xml:base="http://localhost:4000/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/">&lt;p&gt;2017년에 NASNet이 나온 이후 2018년 부터 AutoML의 시대가 열렸습니다.
+MnasNet, MobileNet V3, EffientNet등 여러 경량화 네트워크들은 NAS(Neural Architecture Search)을 사용했고, 모바일쪽 네트워크들은 많이 NAS를 사용하고 있습니다.
+이번에 소개할 논문은 &lt;a href=&quot;https://arxiv.org/pdf/1611.01578.pdf&quot;&gt;Neural Architecture Search with Reinforcement Learning&lt;/a&gt;를 소개해드리겠습니다.&lt;/p&gt;
+
+&lt;p&gt;Neural Architecture Search은 RNN을 사용하여 model description을 생성하고 생성된 네트워크를 학습합니다.
+그리고 validation set을 이용하여 accuracy를 구하고 이를 reward로 만듭니다.
+후에 이 reward를 갖고 policy gradient를 구해 controller를 업데이트 시킵니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/105997147-9dbfae80-60ee-11eb-9477-1c820fdb31cb.png&quot; alt=&quot;Figure1&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;generate-model-description&quot;&gt;Generate Model Description&lt;/h2&gt;
+&lt;p&gt;NAS에서 controller가 model description을 만듭니다.
+model description을 갖고 model을 만든 다음 학습을 시킵고 수렴이 되면 validation set으로 accuracy를 측정하게 됩니다.
+controller RNN의 파라미터 &lt;script type=&quot;math/tex&quot;&gt;\theta_c&lt;/script&gt;는 validation accuracy의 평균을 이용해 최적화 시킵니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/106002532-98fdf900-60f4-11eb-9e16-597b22b9371d.png&quot; alt=&quot;Figure2&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;training-with-reinforce&quot;&gt;Training With REINFORCE&lt;/h2&gt;
+&lt;p&gt;controller를 학습시키려면 우리는 loss 함수를 정의해야합니다.
+controller에서 만들어진 네트워크를 child network라고 하겠습니다. 
+그리고 child network를 구성하기 위한 action들을 &lt;script type=&quot;math/tex&quot;&gt;a_{1:T}&lt;/script&gt;, 학습된 child network의 validation accuracy를 R이라고 할 때 &lt;script type=&quot;math/tex&quot;&gt;J(\theta_c)&lt;/script&gt;는 다음과 같습니다.&lt;/p&gt;
+
+&lt;center&gt;
+$$J(\theta_c)=E_{P(a_{1:T};\theta_c)}[R]$$
+&lt;/center&gt;
+
+&lt;p&gt;reward signal인 R은 미분 불가능하기 떄문에 REINFORCE라는 policy로 update를 합니다.
+이는 다음과 같은 식으로 만들 수 있고&lt;/p&gt;
+
+&lt;center&gt;
+$$\nabla_{\theta_c} J(\theta_c) = \sum_{t=1}^{T}E_{P(a_1:T; \theta_c)}[\nabla_{\theta_c} logP(a_t | a_{(t-1):1}; theta_c) R]$$  
+&lt;/center&gt;
+
+&lt;p&gt;따라서 위의 식은 다음과 같이 근사될 수 있습니다.&lt;/p&gt;
+
+&lt;center&gt;
+$$\frac{1}{m} \sum_{k=1}^{m} \sum_{t=1}^{T} \nabla_{\theta_c} logP(a_t | a_{(t-1):1}; {\theta_c}) R_k$$  
+&lt;/center&gt;
+
+&lt;p&gt;m은 한 배치에 controller가 만들 child network의 개수이고 k번째 child network의 validation accuracy를 &lt;script type=&quot;math/tex&quot;&gt;R_k&lt;/script&gt;이다.
+위의 식은 불편 추정치이지만 분산이 크기 때문에 분산을 줄이기 위해서 다음과 같은 식을 씁니다.&lt;/p&gt;
+
+&lt;center&gt;
+$$\frac{1}{m} \sum_{k=1}^{m} \sum_{t=1}^{T} \nabla_{\theta_c} logP(a_t | a_{(t-1):1}; {\theta_c}) (R_k-b)$$  
+&lt;/center&gt;
+
+&lt;p&gt;b는 이전 네트워크들의 validation accuracy의 지수이동평균입니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;skip-connection&quot;&gt;Skip Connection&lt;/h2&gt;
+&lt;p&gt;GoogleNet, ResNet같은 네트워크들은 skip connection을 통해 성능을 높힙니다.
+이와 같이 NASNet에서도 skip connection을 생성하기 위해 다음과 같이 설정했습니다.&lt;/p&gt;
+
+&lt;p&gt;layer N에서 이전의 layer으로 부터 skip connection이 있는지를 결정하는 N-1개의 content-based sigmoid(anchor point)를 추가합니다.&lt;/p&gt;
+
+&lt;center&gt;
+P(Layer j is an input to layer i) = $$sigmoid(v^T tanh(W_{prev} * h_j + W_{curr} * h_i))$$  
+&lt;/center&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;h_j&lt;/script&gt;는 j번째 layer의 controller의 hiddenstate이고 그 값은 0 부터 N-1까지 가질 수 있다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/106002715-cb0f5b00-60f4-11eb-81a2-64e564aabcf0.png&quot; alt=&quot;Figure3&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;하지만 이렇게 연결하다보면 구조가 망가지는 경우가 있기 때문에 다음과 같은 규칙을 정한다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;input layer로 쓴 layer는 다른 layer의 input layer가 되지 않는다.&lt;/li&gt;
+  &lt;li&gt;skip connection이 안되어있는 layer를 다 final layer에 connection을 만든다.&lt;/li&gt;
+  &lt;li&gt;만약 skip connection시 layer의 size가 다르면 zero padding을 한다.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;result&quot;&gt;Result&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/106003536-a49def80-60f5-11eb-8f93-49d8ff7bc92f.png&quot; alt=&quot;Table1&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;opinion&quot;&gt;Opinion&lt;/h2&gt;
+&lt;p&gt;손수 만든 네트워크들에 비해 그렇게까지 정확도가 높다고 말할 수는 없지만 그래도 AutoML로 만들었다는 것에 의의가 있는 것 같습니다.
+그리고 실험결과를 볼 때 filter들은 직사각형이 많다라는 말이 있는데 무작위로 뽑아도 직사각형이 될 확률이 높아서 그렇지 않을까 생각합니다.&lt;/p&gt;</content><author><name></name></author><summary type="html">2017년에 NASNet이 나온 이후 2018년 부터 AutoML의 시대가 열렸습니다. MnasNet, MobileNet V3, EffientNet등 여러 경량화 네트워크들은 NAS(Neural Architecture Search)을 사용했고, 모바일쪽 네트워크들은 많이 NAS를 사용하고 있습니다. 이번에 소개할 논문은 Neural Architecture Search with Reinforcement Learning를 소개해드리겠습니다. Neural Architecture Search은 RNN을 사용하여 model description을 생성하고 생성된 네트워크를 학습합니다. 그리고 validation set을 이용하여 accuracy를 구하고 이를 reward로 만듭니다. 후에 이 reward를 갖고 policy gradient를 구해 controller를 업데이트 시킵니다. Generate Model Description NAS에서 controller가 model description을 만듭니다. model description을 갖고 model을 만든 다음 학습을 시킵고 수렴이 되면 validation set으로 accuracy를 측정하게 됩니다. controller RNN의 파라미터 는 validation accuracy의 평균을 이용해 최적화 시킵니다. Training With REINFORCE controller를 학습시키려면 우리는 loss 함수를 정의해야합니다. controller에서 만들어진 네트워크를 child network라고 하겠습니다. 그리고 child network를 구성하기 위한 action들을 , 학습된 child network의 validation accuracy를 R이라고 할 때 는 다음과 같습니다. $$J(\theta_c)=E_{P(a_{1:T};\theta_c)}[R]$$ reward signal인 R은 미분 불가능하기 떄문에 REINFORCE라는 policy로 update를 합니다. 이는 다음과 같은 식으로 만들 수 있고 $$\nabla_{\theta_c} J(\theta_c) = \sum_{t=1}^{T}E_{P(a_1:T; \theta_c)}[\nabla_{\theta_c} logP(a_t | a_{(t-1):1}; theta_c) R]$$ 따라서 위의 식은 다음과 같이 근사될 수 있습니다. $$\frac{1}{m} \sum_{k=1}^{m} \sum_{t=1}^{T} \nabla_{\theta_c} logP(a_t | a_{(t-1):1}; {\theta_c}) R_k$$ m은 한 배치에 controller가 만들 child network의 개수이고 k번째 child network의 validation accuracy를 이다. 위의 식은 불편 추정치이지만 분산이 크기 때문에 분산을 줄이기 위해서 다음과 같은 식을 씁니다. $$\frac{1}{m} \sum_{k=1}^{m} \sum_{t=1}^{T} \nabla_{\theta_c} logP(a_t | a_{(t-1):1}; {\theta_c}) (R_k-b)$$ b는 이전 네트워크들의 validation accuracy의 지수이동평균입니다. Skip Connection GoogleNet, ResNet같은 네트워크들은 skip connection을 통해 성능을 높힙니다. 이와 같이 NASNet에서도 skip connection을 생성하기 위해 다음과 같이 설정했습니다. layer N에서 이전의 layer으로 부터 skip connection이 있는지를 결정하는 N-1개의 content-based sigmoid(anchor point)를 추가합니다. P(Layer j is an input to layer i) = $$sigmoid(v^T tanh(W_{prev} * h_j + W_{curr} * h_i))$$ 는 j번째 layer의 controller의 hiddenstate이고 그 값은 0 부터 N-1까지 가질 수 있다. 하지만 이렇게 연결하다보면 구조가 망가지는 경우가 있기 때문에 다음과 같은 규칙을 정한다. input layer로 쓴 layer는 다른 layer의 input layer가 되지 않는다. skip connection이 안되어있는 layer를 다 final layer에 connection을 만든다. 만약 skip connection시 layer의 size가 다르면 zero padding을 한다. Result Opinion 손수 만든 네트워크들에 비해 그렇게까지 정확도가 높다고 말할 수는 없지만 그래도 AutoML로 만들었다는 것에 의의가 있는 것 같습니다. 그리고 실험결과를 볼 때 filter들은 직사각형이 많다라는 말이 있는데 무작위로 뽑아도 직사각형이 될 확률이 높아서 그렇지 않을까 생각합니다.</summary></entry><entry><title type="html">학부생이 본 SENet</title><link href="http://localhost:4000/computer%20vision/2021/01/10/SENet/" rel="alternate" type="text/html" title="학부생이 본 SENet" /><published>2021-01-10T15:41:11+09:00</published><updated>2021-01-10T15:41:11+09:00</updated><id>http://localhost:4000/computer%20vision/2021/01/10/SENet</id><content type="html" xml:base="http://localhost:4000/computer%20vision/2021/01/10/SENet/">&lt;p&gt;ImageNet Challenge에서 많은 네트워크들이 제안되었습니다. 
+ResNet, VGG, Inception그 예입니다. 
+하지만 이러한 네트워크들은 크기가 크다는 것이 단점이었습니다.
+ILSVRC 2017에서 우승한 SENet은 squeeze-and-excitation이라는 구조로 기존 모델에서 추가적으로 성능을 높일 수 있는 Block구조를 만들었습니다.&lt;/p&gt;
+
+&lt;p&gt;이 연구에서는 네트워크의 구조가 아닌 channel들의 관계들에 집중했습니다.
+이전의 연구들에선 channel간의 correlation을 spatial한 정보들을 무시하고 1x1 convolutoin등과 같이 계산했습니다.
+하지만 SENet에서는 global information을 이용해 명시적으로 channel간에 non-linear dependency를 계산하여 모델의 성능을 높였습니다.
+Squeeze-and-excitation구조는 기존의 네트워크에 쉽게 적용하여 성능을 높일 수 있어서 더욱 유용한 구조입니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;squeeze-and-excitation-block&quot;&gt;Squeeze-and-excitation Block&lt;/h2&gt;
+&lt;p&gt;SENet에서 comvolution들의 channeel들의 관계는 receptive field에 제한적이고 암묵적임으로 이를 명시적으로 모델링해주면 정보가 많은 특징들에 더 민감해지면서 성능이 높아진다고 말하고 있습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/104117748-fe1cc500-5366-11eb-9166-2a3f408bc1e4.png&quot; alt=&quot;fig1&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;squeeze-global-information-embedding&quot;&gt;Squeeze: Global Information Embedding&lt;/h3&gt;
+&lt;p&gt;앞써 말했듯 convolutoin은 변환이 receptive field에 국한되어있어서 receptive field밖의 contextual information은 고려할 수 없습니다.
+따라서 global spatial information을 channel discriptor로 만들기 위해 Squeeze연산을 수행합니다. 
+이 과정은 간단히 global average pooling을 이용했습니다.&lt;/p&gt;
+
+&lt;p&gt;Channel discriptor인 &lt;script type=&quot;math/tex&quot;&gt;z \cap R^n&lt;/script&gt;은 &lt;em&gt;U&lt;/em&gt;를 spatial dimension으로 &lt;script type=&quot;math/tex&quot;&gt;H \times W&lt;/script&gt;만큼 압축해서 얻을 수 있습니다.
+따라서 c번째 체널의 z성분은 다음과 같이 계산될 수 있습니다.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;z_c = F_{sq}(u_c) = \frac{1}{H \times W} \sum_{i=1}^{H} \sum_{j=1}^{W} u_c(i, j)&lt;/script&gt;
+
+&lt;p&gt;&lt;em&gt;transformation U는 전체적인 이미지의 통계값인 local descriptor로 생각될 수 있고 global average pooling으로 구현할 수 있습니다.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Excitation: Adaptive Recallibration
+Channel discriptor를 만들었으면 이제 체널의 관계들을 계산해줘야 합니다. 
+여기서 고려해야할 사항이 두 개가 있습니다.&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;체널들의 관계를 포착하기 위해 flexible해야합니다.&lt;/li&gt;
+  &lt;li&gt;체널들을 강조하기 위해 non-mutually-exclusive한 정보를 학습해야 합니다. (one-hot같은 mutually-exclusive면 안됩니다.)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;따라서 여기서는 sigmoid를 사용했습니다.&lt;br /&gt;
+&lt;script type=&quot;math/tex&quot;&gt;s=F_{ex}(z, W) = \sigma(g(z, W)) = \sigma(W_2(\delta(W_1, z))&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;\delta&lt;/script&gt;는 ReLU함수를 의미하고, &lt;script type=&quot;math/tex&quot;&gt;W_1 \cap R^{\frac{C}{r} \times C}&lt;/script&gt; 그리고 &lt;script type=&quot;math/tex&quot;&gt;W_2 \cap R^{C \times \frac{C}{r}}&lt;/script&gt;
+모델의 복잡도와 일반화를 위해서 bottleneck이 있는 두 개의 FC Layer를 이용했고 reduction ratio r을 갖습니다.&lt;/p&gt;
+
+&lt;p&gt;따라서 최종 출력은&lt;br /&gt;
+&lt;script type=&quot;math/tex&quot;&gt;\tilde{x_c} = F_{scale}(u_c, s_c) = s_c u_c&lt;/script&gt;&lt;br /&gt;
+&lt;script type=&quot;math/tex&quot;&gt;\tilde{X} = [\tilde{x_1}, \tilde{x_2}, ... , \tilde{x_C}]&lt;/script&gt; 이고 &lt;script type=&quot;math/tex&quot;&gt;F_{scale}(u_c, s_c)&lt;/script&gt;은 channel-wise multiplication을 의미합니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;excitation operator는 channel discriptor인 z를 channel weight으로 연결해주는 연산입니다.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;이 두 가지 연산을 통해 적은 추가적인 연산량과 모델크리고 model capacity를 늘릴수 있습니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;se-inception-ans-se-resnet&quot;&gt;SE-Inception ans SE-ResNet&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/104117749-ff4df200-5366-11eb-8966-e1aa2f4ccc25.png&quot; alt=&quot;fig2&quot; /&gt;
+다음과 같이 Residual Block에 Squeeze-and-excitation구조를 적용함으로써 기존의 네트워크의 성능을 높일 수 있습니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;result&quot;&gt;Result&lt;/h2&gt;
+&lt;p&gt;SE-Inception ans SE-ResNet의 다음과 같습니다.&lt;br /&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/104117779-43d98d80-5367-11eb-82a8-4372bf1999c8.png&quot; alt=&quot;table1&quot; /&gt;
+그리고 실험 결과는 다음과 같습니다.&lt;br /&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/104117780-44722400-5367-11eb-8ec5-fc05c29722fe.png&quot; alt=&quot;table2&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;마치며&quot;&gt;마치며&lt;/h2&gt;
+&lt;p&gt;Squeeze-and-excitation Block은 MobileNet V3등 여러 네트워크에서 사용하는 강력한 구조입니다. 
+EffientNet과 같이 새로운 네트워크 구조를 제안할까가 아니라 기존 네트워크의 부족한 점이 무엇인지 생각한 다음 실험을 하여 더 좋은 성능을 얻었다는 것이 신기했습니다.
+특히 이전 연구들과 달리 channel간의 dependency를 global한 contextual information까지 확장했다는 것에 대해 의의가 있는 것 같습니다.&lt;/p&gt;</content><author><name></name></author><summary type="html">ImageNet Challenge에서 많은 네트워크들이 제안되었습니다. ResNet, VGG, Inception그 예입니다. 하지만 이러한 네트워크들은 크기가 크다는 것이 단점이었습니다. ILSVRC 2017에서 우승한 SENet은 squeeze-and-excitation이라는 구조로 기존 모델에서 추가적으로 성능을 높일 수 있는 Block구조를 만들었습니다. 이 연구에서는 네트워크의 구조가 아닌 channel들의 관계들에 집중했습니다. 이전의 연구들에선 channel간의 correlation을 spatial한 정보들을 무시하고 1x1 convolutoin등과 같이 계산했습니다. 하지만 SENet에서는 global information을 이용해 명시적으로 channel간에 non-linear dependency를 계산하여 모델의 성능을 높였습니다. Squeeze-and-excitation구조는 기존의 네트워크에 쉽게 적용하여 성능을 높일 수 있어서 더욱 유용한 구조입니다. Squeeze-and-excitation Block SENet에서 comvolution들의 channeel들의 관계는 receptive field에 제한적이고 암묵적임으로 이를 명시적으로 모델링해주면 정보가 많은 특징들에 더 민감해지면서 성능이 높아진다고 말하고 있습니다. Squeeze: Global Information Embedding 앞써 말했듯 convolutoin은 변환이 receptive field에 국한되어있어서 receptive field밖의 contextual information은 고려할 수 없습니다. 따라서 global spatial information을 channel discriptor로 만들기 위해 Squeeze연산을 수행합니다. 이 과정은 간단히 global average pooling을 이용했습니다. Channel discriptor인 은 U를 spatial dimension으로 만큼 압축해서 얻을 수 있습니다. 따라서 c번째 체널의 z성분은 다음과 같이 계산될 수 있습니다. transformation U는 전체적인 이미지의 통계값인 local descriptor로 생각될 수 있고 global average pooling으로 구현할 수 있습니다. Excitation: Adaptive Recallibration Channel discriptor를 만들었으면 이제 체널의 관계들을 계산해줘야 합니다. 여기서 고려해야할 사항이 두 개가 있습니다. 체널들의 관계를 포착하기 위해 flexible해야합니다. 체널들을 강조하기 위해 non-mutually-exclusive한 정보를 학습해야 합니다. (one-hot같은 mutually-exclusive면 안됩니다.) 따라서 여기서는 sigmoid를 사용했습니다. 는 ReLU함수를 의미하고, 그리고 모델의 복잡도와 일반화를 위해서 bottleneck이 있는 두 개의 FC Layer를 이용했고 reduction ratio r을 갖습니다. 따라서 최종 출력은 이고 은 channel-wise multiplication을 의미합니다. excitation operator는 channel discriptor인 z를 channel weight으로 연결해주는 연산입니다. 이 두 가지 연산을 통해 적은 추가적인 연산량과 모델크리고 model capacity를 늘릴수 있습니다. SE-Inception ans SE-ResNet 다음과 같이 Residual Block에 Squeeze-and-excitation구조를 적용함으로써 기존의 네트워크의 성능을 높일 수 있습니다. Result SE-Inception ans SE-ResNet의 다음과 같습니다. 그리고 실험 결과는 다음과 같습니다. 마치며 Squeeze-and-excitation Block은 MobileNet V3등 여러 네트워크에서 사용하는 강력한 구조입니다. EffientNet과 같이 새로운 네트워크 구조를 제안할까가 아니라 기존 네트워크의 부족한 점이 무엇인지 생각한 다음 실험을 하여 더 좋은 성능을 얻었다는 것이 신기했습니다. 특히 이전 연구들과 달리 channel간의 dependency를 global한 contextual information까지 확장했다는 것에 대해 의의가 있는 것 같습니다.</summary></entry><entry><title type="html">[Python] 우선순위 큐 (heapq vs priority queue)</title><link href="http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/" rel="alternate" type="text/html" title="[Python] 우선순위 큐 (heapq vs priority queue)" /><published>2021-01-10T15:41:11+09:00</published><updated>2021-01-10T15:41:11+09:00</updated><id>http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q</id><content type="html" xml:base="http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/">&lt;p&gt;파이썬에서는 유용한 자료구조 라이브러리를 제공합니다. 
+그 중에 하나는 우선순위 큐(priority queue)입니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;우선순위-큐란&quot;&gt;우선순위 큐란?&lt;/h2&gt;
+&lt;p&gt;우리는 많은 경우에서 우선순위를 만납니다.
+응급실의 예를 들어보겠습니다.
+다음의 환자들이 있습니다. 
+스케쥴링을 이야기할 것이 아니기 때문에 치료 시간은 0으로 가정하겠습니다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;5분 이내 치료해야할 사람&lt;/li&gt;
+  &lt;li&gt;10분 이내 치료해야할 사람&lt;/li&gt;
+  &lt;li&gt;2분 이내 치료해야할 사람&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;우리는 위의 환자의 치료 순위를 어떻게 정해야합니까?
+3 -&amp;gt; 1 -&amp;gt; 2순으로 치료해야 할 것입니다. 
+위의 상황을 해결해주는 자료구조가 우선순위 큐입니다.&lt;/p&gt;
+
+&lt;p&gt;구현 방법은 이 글에서 다루지 않겠습니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;파이썬-라이브러리&quot;&gt;파이썬 라이브러리&lt;/h2&gt;
+&lt;p&gt;파이썬에서는 heapq, PriorityQueue로 우선순위 큐를 지원합니다.
+사용법은 다음과 같습니다.&lt;/p&gt;
+
+&lt;h3 id=&quot;heapq&quot;&gt;heapq&lt;/h3&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;heapq&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;heapq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;heappush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;heapq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;heappush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;heapq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;heappush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;heapq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;heappop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# 1
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;heapq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;heappop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# 2
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;heapq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;heappop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# 3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;priorityqueue&quot;&gt;PriorityQueue&lt;/h3&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;queue&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PriorityQueue&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PriorityQueue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# 1
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# 2
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# 3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;다음과 같은 의문이 들 수 있습니다.
+&lt;em&gt;똑같은 역할을 하는데 과연 두 라이브러리들은 무엇이 다를까?&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;del&gt;PriorityQueue는 객체이고 heapq는 여러 함수들이 들어있는 파일입니다.&lt;/del&gt;
+맞는 말이긴 합니다.&lt;/p&gt;
+
+&lt;p&gt;정확하게 말하면 PriorityQueue은 lock을 제공하여 thread-safty class입니다.
+반면에 heapq는 list를 사용하기 때문에 thread-safty class가 아닙니다.&lt;/p&gt;
+
+&lt;p&gt;그래서 그런지 몰라도 실행시킬 때 실행속도가 차이가 납니다. (제 추측…)&lt;/p&gt;
+
+&lt;h2 id=&quot;실행속도-비교&quot;&gt;실행속도 비교&lt;/h2&gt;
+&lt;p&gt;t2.micro에서 실험을 진행했습니다.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Duration of PriorityQueue 0.980911
+Duration of heapq         0.175374
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;코드&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;queue&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PriorityQueue&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;heapq&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;random&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;time&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;time&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;100000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;priority_queue&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;PriorityQueue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;start&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;priority_queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;priority_queue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;end&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Duration of PriorityQueue &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;end&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+
+&lt;span class=&quot;n&quot;&gt;start&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;heapq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;heappush&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nums&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;heapq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;heappop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;end&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;sa&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'Duration of heapq         &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;end&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;마치며&quot;&gt;마치며&lt;/h2&gt;
+&lt;p&gt;사실 이 라이브러리는 백준 &lt;a href=&quot;https://www.acmicpc.net/problem/1202&quot;&gt;보석도둑&lt;/a&gt;을 풀면서 알게되었습니다.
+알고리즘문제를 풀때 heapq를 써야지 PriorityQueue를 쓰면 시간초과가 결렸습니다.&lt;br /&gt;
+다들 저와 같은 실수를 하지 않길 빌면서 이만 가보도록 하겠습니다.
+&lt;del&gt;알고리즘 어렵다!&lt;/del&gt;&lt;/p&gt;</content><author><name></name></author><summary type="html">파이썬에서는 유용한 자료구조 라이브러리를 제공합니다. 그 중에 하나는 우선순위 큐(priority queue)입니다. 우선순위 큐란? 우리는 많은 경우에서 우선순위를 만납니다. 응급실의 예를 들어보겠습니다. 다음의 환자들이 있습니다. 스케쥴링을 이야기할 것이 아니기 때문에 치료 시간은 0으로 가정하겠습니다. 5분 이내 치료해야할 사람 10분 이내 치료해야할 사람 2분 이내 치료해야할 사람 우리는 위의 환자의 치료 순위를 어떻게 정해야합니까? 3 -&amp;gt; 1 -&amp;gt; 2순으로 치료해야 할 것입니다. 위의 상황을 해결해주는 자료구조가 우선순위 큐입니다. 구현 방법은 이 글에서 다루지 않겠습니다. 파이썬 라이브러리 파이썬에서는 heapq, PriorityQueue로 우선순위 큐를 지원합니다. 사용법은 다음과 같습니다. heapq import heapq pq = [] heapq.heappush(pq, 1) heapq.heappush(pq, 3) heapq.heappush(pq, 2) heapq.heappop(pq) # 1 heapq.heappop(pq) # 2 heapq.heappop(pq) # 3 PriorityQueue from queue import PriorityQueue pq = PriorityQueue() pq.put(1) pq.put(3) pq.put(2) pq.get() # 1 pq.get() # 2 pq.get() # 3 다음과 같은 의문이 들 수 있습니다. 똑같은 역할을 하는데 과연 두 라이브러리들은 무엇이 다를까? PriorityQueue는 객체이고 heapq는 여러 함수들이 들어있는 파일입니다. 맞는 말이긴 합니다. 정확하게 말하면 PriorityQueue은 lock을 제공하여 thread-safty class입니다. 반면에 heapq는 list를 사용하기 때문에 thread-safty class가 아닙니다. 그래서 그런지 몰라도 실행시킬 때 실행속도가 차이가 납니다. (제 추측…) 실행속도 비교 t2.micro에서 실험을 진행했습니다. Duration of PriorityQueue 0.980911 Duration of heapq 0.175374 코드 from queue import PriorityQueue import heapq import random from time import time nums = [random.random() for _ in range(100000)] priority_queue = PriorityQueue() pq = [] start = time() for i in range(len(nums)): priority_queue.put(nums[i]) for i in range(len(nums)): priority_queue.get() end = time() print(f'Duration of PriorityQueue {end - start:.6f}') start = time() for i in range(len(nums)): heapq.heappush(pq, nums[i]) for i in range(len(nums)): heapq.heappop(pq) end = time() print(f'Duration of heapq {end - start:.6f}') 마치며 사실 이 라이브러리는 백준 보석도둑을 풀면서 알게되었습니다. 알고리즘문제를 풀때 heapq를 써야지 PriorityQueue를 쓰면 시간초과가 결렸습니다. 다들 저와 같은 실수를 하지 않길 빌면서 이만 가보도록 하겠습니다. 알고리즘 어렵다!</summary></entry><entry><title type="html">[네트워크 경량화] EffientNet</title><link href="http://localhost:4000/computer%20vision/light%20weight/2021/01/03/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EA%B2%BD%EB%9F%89%ED%99%94-EffientNet/" rel="alternate" type="text/html" title="[네트워크 경량화] EffientNet" /><published>2021-01-03T16:41:11+09:00</published><updated>2021-01-03T16:41:11+09:00</updated><id>http://localhost:4000/computer%20vision/light%20weight/2021/01/03/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EA%B2%BD%EB%9F%89%ED%99%94-EffientNet</id><content type="html" xml:base="http://localhost:4000/computer%20vision/light%20weight/2021/01/03/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EA%B2%BD%EB%9F%89%ED%99%94-EffientNet/">&lt;p&gt;이번에 소개해드릴 논문은 &lt;a href=&quot;https://arxiv.org/pdf/1905.11946.pdf&quot;&gt;EffientNet&lt;/a&gt;입니다. 
+EffientNet은 ICML 2019에 나왔고, 저자는 이전에 &lt;a href=&quot;https://arxiv.org/pdf/1807.11626.pdf&quot;&gt;MnasNet&lt;/a&gt;을 발표한 적이 있습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/103470554-d225a080-4db6-11eb-81c9-d007e577ec0a.png&quot; alt=&quot;fig0&quot; /&gt;
+실험 결과&lt;/p&gt;
+
+&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;ImageNet Dataset이 나온 이후에 여러 classification모델이 제안되었습니다.
+VGG이후 ResNet부터 네트워크를 깊게 쌓음으로써 정확도를 올리게 되었고, GPipe경우에는 base model보다 4배를 크게 만듬으로써 ImageNet에서 우승했습니다.
+&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/103459243-1f6f2700-4d51-11eb-810c-394453750a0e.png&quot; alt=&quot;fig1&quot; /&gt;
+이와 같이 보통은 depth를 늘리면서 정확도를 올리고 width를 늘리거나 resolution을 늘리면서 정확도를 올리게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;이러한 연구들을 보다 보면 &lt;strong&gt;depth, width, resolution이렇게 3가지를 균형을 맞추면 더 성능이 좋아지지 않을까?”&lt;/strong&gt; 이런 생각을 갖게될 것입니다.
+직관적으로 생각하면 큰 resolution의 이미지를 넣으면 receptive field가 커지게되고 그 패턴을 캡쳐하기 위해 channel수도 늘어야될 것입니다.
+EffientNet은 이러한 아이디어를 갖고 &lt;strong&gt;compound scaling method&lt;/strong&gt;를 제안하며 기존의 네트워크의 성능을 올리게 되었고, 새로운 state-of-art모델을 제안했습니다.&lt;/p&gt;
+
+&lt;h3 id=&quot;compund-model-scaling&quot;&gt;Compund Model Scaling&lt;/h3&gt;
+&lt;p&gt;Comvolution Filter는 다음과 같이 정의할 수 있습니다.&lt;/p&gt;
+&lt;center&gt;
+$$Y_i=\mathcal{F}_i(X_i)$$  
+&lt;/center&gt;
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;Y_i&lt;/script&gt;는 output tensor, &lt;script type=&quot;math/tex&quot;&gt;X_i&lt;/script&gt;는 input tensor, &lt;script type=&quot;math/tex&quot;&gt;\mathcal{F}&lt;/script&gt;는 operator입니다.&lt;/p&gt;
+
+&lt;p&gt;이것을 &lt;script type=&quot;math/tex&quot;&gt;L_i&lt;/script&gt;개의 Layer를 쌓는다고 하면 다음과 같이 표시할 수 있습니다.&lt;/p&gt;
+&lt;center&gt;
+$$\mathcal{N} = \bigodot_{i=1...s} \mathcal{F}^{L_i}(\mathrm{X}_{&amp;lt;H_i, W_i, C_i})$$ 
+&lt;/center&gt;
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;\mathcal{F}^{L_i}&lt;/script&gt;는 &lt;script type=&quot;math/tex&quot;&gt;\mathcal{F}^{i}&lt;/script&gt;가 &lt;script type=&quot;math/tex&quot;&gt;L_i&lt;/script&gt;번 반복되는 notation입니다.&lt;/p&gt;
+
+&lt;p&gt;이렇게 간단한 식으로 표시했지만 &lt;script type=&quot;math/tex&quot;&gt;H_i, W_i, C_i&lt;/script&gt;를 각각 조절해야하기 때문에 Design Space가 너무 넓어서, design space를 좁히기 위해 다음과 같이 constant ratio를 사용하여 표현했고 다음의 수식을 optimization을 하는 것이 목표로 잡을 것 입니다.&lt;/p&gt;
+
+&lt;center&gt;
+$$max_{d, w, r} \mathcal{Accuracy}(\mathcal{N}(d, w, r))$$  
+$$s.t \mathcal{N}(d, w, r) = \bigodot_{i=1..s} \hat{\mathcal{F}}_i^{d ⋅ \hat{L}_i}(X_{r ⋅ \hat{H}_i, r ⋅ \hat{W}_i, w /cdot \hat{C}_i})$$  
+
+$$Memory(\mathcal{N}) \leq target_memory$$  
+$$FLOPS(\mathcal{N}) \leq target_flops$$  
+&lt;/center&gt;
+
+&lt;p&gt;여기서 &lt;script type=&quot;math/tex&quot;&gt;\hat{F} \hat{H}, \hat{W}, \hat{C}&lt;/script&gt;는 각각 Base model의 parameter를 나타낸 것입니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;scaling-dimensions&quot;&gt;Scaling Dimensions&lt;/h2&gt;
+&lt;p&gt;자 이제 문제는 depth, width, resolution의 조합이 아닌, linear equation의 variacnce인 d, w, r를 조절하는 문제입니다. 먼저 각각의 요소의 영향을 살펴보면 다음과 같이 볼 수 있습니다.
+&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/103458582-ec2a9900-4d4c-11eb-8b19-ed4f2fb4827e.png&quot; alt=&quot;Figure3&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;depthd&quot;&gt;Depth(&lt;em&gt;d&lt;/em&gt;)&lt;/h3&gt;
+&lt;p&gt;직관적으로 더 깊은 ConvNet은 더 풍부하고 복잡한 feature를 찾을 수 있지만, 더 깊은 ConvNet은 vanishing gradient problem 등과 같은 문제 때문에 학습하기 힘듭니다.&lt;/p&gt;
+
+&lt;h3 id=&quot;widthw&quot;&gt;Width(&lt;em&gt;w&lt;/em&gt;)&lt;/h3&gt;
+&lt;p&gt;더 큰 width를 갖는 네트워크는 또한 더 풍부하고 복잡한 feature를 찾을 수 있지만, width가 크지만 네트워크가 깊지가 않으면 high level feature를 잡을 수 없습니다.&lt;/p&gt;
+
+&lt;h3 id=&quot;resolutionr&quot;&gt;Resolution(&lt;em&gt;r&lt;/em&gt;)&lt;/h3&gt;
+&lt;p&gt;화질이 좋은 이미지는 더욱 세세한 패턴을 잡을 수 있지만,  이미지 사이즈가 커지면 커질수록 정확도가 증가되는 양은 적어집니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Observation 1&lt;/strong&gt; - Depth, Width, Resolution를 키우면서 정확도를 높일 수 있지만, 커짐에 따라 정확도 증가율은 낮아집니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;compund-scaling&quot;&gt;Compund Scaling&lt;/h2&gt;
+&lt;p&gt;직관적으로 이미지의 화질이 커지면 네트워크의 깊이가 깊어져야하고 이에 따라 receptive field가 커져야 할 것입니다.
+이러한 생각으로 세 가지 요소를 균형을 잡아가면서 늘려가는 것이 좋을 것입니다.&lt;/p&gt;
+
+&lt;p&gt;아래의 그림과 같이 depth와 resolution을 고정시키고 width만 늘리면 정확도 증가율이 낮아집니다.
+&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/103458696-f731f900-4d4d-11eb-83ec-e9395a9cde51.png&quot; alt=&quot;Fig4&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Observation 2&lt;/strong&gt; - Observation 1의 한계를 극복하기 위해선 더 좋은 정확도를 위해서는 depth, width, resolution의 균형을 잡으면서 ConvNet의 크기를 키워야합니다.&lt;/p&gt;
+
+&lt;p&gt;따라서 EffientNet에서는 새로운 &lt;strong&gt;Compund Model Scaling&lt;/strong&gt;을 제안했습니다.&lt;/p&gt;
+
+&lt;center&gt;
+$$depth: d = \alpha^\phi$$
+$$width: w = \beta^\phi$$
+$$depth: r = \gamma^\phi$$
+&lt;/center&gt;
+
+&lt;p&gt;보통 ConvNet은 &lt;script type=&quot;math/tex&quot;&gt;d, w^2, r^2&lt;/script&gt;에 비례합니다. 
+따라서 이 논문에서는 &lt;script type=&quot;math/tex&quot;&gt;\alpha \cdot \beta^2 \cdot \gamma^2 \approx 2&lt;/script&gt;을 잡고 &lt;script type=&quot;math/tex&quot;&gt;\phi&lt;/script&gt;를 조절해가며 model의 capacity를 높입니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;effientnet&quot;&gt;EffientNet&lt;/h2&gt;
+&lt;p&gt;앞에서와 같은 아이디어 제안이 있지만 그래도 좋은 모델을 만드는 것이 좋기 때문에 여기서도 새로운 모델을 제안했습니다.
+&lt;script type=&quot;math/tex&quot;&gt;ACC(m)\times[FLOPS(M)/T]^w&lt;/script&gt;을 optimization goal로 놓고 Neural Architecture Search를 해 EffientNet-B0모델을 만들었습니다.
+Main block은 은 squeeze-and-excitation을 추가한 mobile inverted bottleneck입니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/103459180-8b9d5b00-4d50-11eb-83a4-8a109109fdc8.png&quot; alt=&quot;table1&quot; /&gt;
+&lt;strong&gt;EffientNet-B0의 구조&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;그리고 다음 두 가지 Step으로 다른 모델을 만든다.&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;&lt;script type=&quot;math/tex&quot;&gt;\phi=1&lt;/script&gt;을 고정시키고 Grid Search로 찾은 값은 EffientNet-B0의 최적의 값은 &lt;script type=&quot;math/tex&quot;&gt;\alpha=1.2, \beta=1.1 \gamma=1.15&lt;/script&gt;입니다.&lt;/li&gt;
+  &lt;li&gt;다음은 &lt;script type=&quot;math/tex&quot;&gt;\phi&lt;/script&gt;를 키워가면서 EffientNet-B1부터 B7를 만들었습니다.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;result&quot;&gt;Result&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/103459204-c7d0bb80-4d50-11eb-85bb-4b4dcd3e93b2.png&quot; alt=&quot;table2&quot; /&gt;
+이 표에서 볼 수 있는 것과 같이 같은 Accuracy대비 FLOPS를 많이 줄일 수 있습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://user-images.githubusercontent.com/40621030/103470556-d356cd80-4db6-11eb-8b97-87c22ecfa9fd.png&quot; alt=&quot;table3&quot; /&gt;
+기존에 있는 네트워크에 compund scaling을 사용하면 정확도가 높아집니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;마치며&quot;&gt;마치며&lt;/h2&gt;
+&lt;p&gt;EffientNet은 기존의 새로운 네트워크의 구조를 제안한 것이 아닌 기존의 네트워크에서 부족한 것이 무엇이 있을까라는 의문을 갖고 연구를 했습니다.
+depth, width, resolution는 각각 독립적인 것이 아닌 의존적이다는 것을 의식하며 연구해 좋은 성과를 냈다는 것이 좋은 연구방법과 결과라고 생각합니다.&lt;/p&gt;</content><author><name></name></author><summary type="html">이번에 소개해드릴 논문은 EffientNet입니다. EffientNet은 ICML 2019에 나왔고, 저자는 이전에 MnasNet을 발표한 적이 있습니다. 실험 결과 Introduction ImageNet Dataset이 나온 이후에 여러 classification모델이 제안되었습니다. VGG이후 ResNet부터 네트워크를 깊게 쌓음으로써 정확도를 올리게 되었고, GPipe경우에는 base model보다 4배를 크게 만듬으로써 ImageNet에서 우승했습니다. 이와 같이 보통은 depth를 늘리면서 정확도를 올리고 width를 늘리거나 resolution을 늘리면서 정확도를 올리게 됩니다. 이러한 연구들을 보다 보면 depth, width, resolution이렇게 3가지를 균형을 맞추면 더 성능이 좋아지지 않을까?” 이런 생각을 갖게될 것입니다. 직관적으로 생각하면 큰 resolution의 이미지를 넣으면 receptive field가 커지게되고 그 패턴을 캡쳐하기 위해 channel수도 늘어야될 것입니다. EffientNet은 이러한 아이디어를 갖고 compound scaling method를 제안하며 기존의 네트워크의 성능을 올리게 되었고, 새로운 state-of-art모델을 제안했습니다. Compund Model Scaling Comvolution Filter는 다음과 같이 정의할 수 있습니다. $$Y_i=\mathcal{F}_i(X_i)$$ 는 output tensor, 는 input tensor, 는 operator입니다. 이것을 개의 Layer를 쌓는다고 하면 다음과 같이 표시할 수 있습니다. $$\mathcal{N} = \bigodot_{i=1...s} \mathcal{F}^{L_i}(\mathrm{X}_{&amp;lt;H_i, W_i, C_i})$$ 는 가 번 반복되는 notation입니다. 이렇게 간단한 식으로 표시했지만 를 각각 조절해야하기 때문에 Design Space가 너무 넓어서, design space를 좁히기 위해 다음과 같이 constant ratio를 사용하여 표현했고 다음의 수식을 optimization을 하는 것이 목표로 잡을 것 입니다. $$max_{d, w, r} \mathcal{Accuracy}(\mathcal{N}(d, w, r))$$ $$s.t \mathcal{N}(d, w, r) = \bigodot_{i=1..s} \hat{\mathcal{F}}_i^{d ⋅ \hat{L}_i}(X_{r ⋅ \hat{H}_i, r ⋅ \hat{W}_i, w /cdot \hat{C}_i})$$ $$Memory(\mathcal{N}) \leq target_memory$$ $$FLOPS(\mathcal{N}) \leq target_flops$$ 여기서 는 각각 Base model의 parameter를 나타낸 것입니다. Scaling Dimensions 자 이제 문제는 depth, width, resolution의 조합이 아닌, linear equation의 variacnce인 d, w, r를 조절하는 문제입니다. 먼저 각각의 요소의 영향을 살펴보면 다음과 같이 볼 수 있습니다. Depth(d) 직관적으로 더 깊은 ConvNet은 더 풍부하고 복잡한 feature를 찾을 수 있지만, 더 깊은 ConvNet은 vanishing gradient problem 등과 같은 문제 때문에 학습하기 힘듭니다. Width(w) 더 큰 width를 갖는 네트워크는 또한 더 풍부하고 복잡한 feature를 찾을 수 있지만, width가 크지만 네트워크가 깊지가 않으면 high level feature를 잡을 수 없습니다. Resolution(r) 화질이 좋은 이미지는 더욱 세세한 패턴을 잡을 수 있지만, 이미지 사이즈가 커지면 커질수록 정확도가 증가되는 양은 적어집니다. Observation 1 - Depth, Width, Resolution를 키우면서 정확도를 높일 수 있지만, 커짐에 따라 정확도 증가율은 낮아집니다. Compund Scaling 직관적으로 이미지의 화질이 커지면 네트워크의 깊이가 깊어져야하고 이에 따라 receptive field가 커져야 할 것입니다. 이러한 생각으로 세 가지 요소를 균형을 잡아가면서 늘려가는 것이 좋을 것입니다. 아래의 그림과 같이 depth와 resolution을 고정시키고 width만 늘리면 정확도 증가율이 낮아집니다. Observation 2 - Observation 1의 한계를 극복하기 위해선 더 좋은 정확도를 위해서는 depth, width, resolution의 균형을 잡으면서 ConvNet의 크기를 키워야합니다. 따라서 EffientNet에서는 새로운 Compund Model Scaling을 제안했습니다. $$depth: d = \alpha^\phi$$ $$width: w = \beta^\phi$$ $$depth: r = \gamma^\phi$$ 보통 ConvNet은 에 비례합니다. 따라서 이 논문에서는 을 잡고 를 조절해가며 model의 capacity를 높입니다. EffientNet 앞에서와 같은 아이디어 제안이 있지만 그래도 좋은 모델을 만드는 것이 좋기 때문에 여기서도 새로운 모델을 제안했습니다. 을 optimization goal로 놓고 Neural Architecture Search를 해 EffientNet-B0모델을 만들었습니다. Main block은 은 squeeze-and-excitation을 추가한 mobile inverted bottleneck입니다. EffientNet-B0의 구조 그리고 다음 두 가지 Step으로 다른 모델을 만든다. 을 고정시키고 Grid Search로 찾은 값은 EffientNet-B0의 최적의 값은 입니다. 다음은 를 키워가면서 EffientNet-B1부터 B7를 만들었습니다. Result 이 표에서 볼 수 있는 것과 같이 같은 Accuracy대비 FLOPS를 많이 줄일 수 있습니다. 기존에 있는 네트워크에 compund scaling을 사용하면 정확도가 높아집니다. 마치며 EffientNet은 기존의 새로운 네트워크의 구조를 제안한 것이 아닌 기존의 네트워크에서 부족한 것이 무엇이 있을까라는 의문을 갖고 연구를 했습니다. depth, width, resolution는 각각 독립적인 것이 아닌 의존적이다는 것을 의식하며 연구해 좋은 성과를 냈다는 것이 좋은 연구방법과 결과라고 생각합니다.</summary></entry><entry><title type="html">시각장애인을 위한 약학정보제공 서비스 기획기</title><link href="http://localhost:4000/product-design/2020/01/03/barrier-free/" rel="alternate" type="text/html" title="시각장애인을 위한 약학정보제공 서비스 기획기" /><published>2020-01-03T21:49:00+09:00</published><updated>2020-01-03T21:49:00+09:00</updated><id>http://localhost:4000/product-design/2020/01/03/barrier-free</id><content type="html" xml:base="http://localhost:4000/product-design/2020/01/03/barrier-free/">&lt;p&gt;저는 친구와 함께 시각장애인을 위한 약학정보 서비스를 기획하고 개발했습니다. 서비스를 기획하면서 많은 조사와 인터뷰를 진행해 그 경험을 나누고자 합니다.&lt;br /&gt;
+우리는 집에 여러개의 상비약들이 있습니다. 우리는 약상자를 보고 원하는 약을 찾을 수 있지만 시각장애인분들은 찾을 수 있을까요? 저희는 이러한 문제에 주목했고 ‘집에 있는 약을 구분을 할 수 있도록 하자’는 생각으로 서비스를 기획하게 되었습니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;서비스-기획&quot;&gt;서비스 기획&lt;/h2&gt;
+&lt;h3 id=&quot;인터뷰의-필요성&quot;&gt;인터뷰의 필요성&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&quot;https://prography-tech.github.io/assets/posts/zipyak/zipyak-interview.png&quot; alt=&quot;zipyak-interview&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;처음에는 약학정보 서비스가 아닌 시각장애인을 위한 코디추천 서비스를 기획했습니다. 시각장애인들은 눈이 안보이니 자신이 가지고 있는 옷이 무엇인지 코디를 어떻게 할지 모를거라고 생각했고 여러 논문을 찾아보니 시각장애인들은 기억력의 한계 때문에 비시각장애인보다 옷을 적게 갖고있다고 했습니다. 그래서 시각장애인을 위한 코디추천 서비스를 열심히 기획해 기획안을 들고 한 시각장애인분께 부탁을 드려 인터뷰를 진행하기로 했습니다.&lt;/p&gt;
+
+&lt;p&gt;인터뷰를 하던 도중 생각했던 것이 그저 가설이라는 것을 알게되었습니다. 인터뷰 중에 얻었던 내용은 다음과 같습니다.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;자신이 산 옷은 기억한다.&lt;/li&gt;
+  &lt;li&gt;보관중인 옷은 만져보면 무슨 옷인지 알 수 있다.&lt;/li&gt;
+  &lt;li&gt;옷을 살 떄 세트로 코디를 하면서 사 패션에 대해 그렇게 신경쓰지 않는다.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;em&gt;즉 이 서비스에 대한 Needs가 크지 않다는 것입니다.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;기획-변경&quot;&gt;기획 변경&lt;/h2&gt;
+&lt;h3 id=&quot;소비자의-환경을-파악하라&quot;&gt;소비자의 환경을 파악하라&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&quot;https://prography-tech.github.io/assets/posts/zipyak/voiceover.png&quot; alt=&quot;voiceover-icon&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;인터뷰를 하던 도중 약학정보를 얻기 힘들다는 이야기를 들었습니다. 그 소리를 듣는 순간 사용할 수 있는 서비스가 없나? 라는 생각이 들었고 앱스토어서 관련서비스를 찾아봤고 iOS 모바일 어플리케이션에서 시각장애인이 사용할 수 있는 서비스가 없었습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://prography-tech.github.io/assets/posts/zipyak/incorrect-app-label.png&quot; alt=&quot;incorrect-app-label&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;많은 어플리케이션은 label을 만들 때 다음과 같이 만듭니다. &lt;em&gt;이러한 labeling이 왜 문제가 될까요?&lt;/em&gt;&lt;br /&gt;
+시각장애인들은 Voice Assistance나 Voice Over와 같은 스크린 리더를 통해 화면을 읽습니다. 이 스크린 리더는 Componentent들의 label이나 text 값을 읽어주기 때문에 이것을 고려를 안하고 앱을 제작하면 시각장애인들이 쓸 수 없게 됩니다.&lt;/p&gt;
+
+&lt;p&gt;여러 인터뷰와 회의를 통해 시각장애인을 위한 코디서비스가 아닌 시각장애인을 위한 약학정보제공서비스로 기획을 변경하게 되었습니다.&lt;/p&gt;
+
+&lt;h3 id=&quot;시각장애인을-위한-uiux&quot;&gt;시각장애인을 위한 UI/UX&lt;/h3&gt;
+&lt;h4 id=&quot;ui에-대해&quot;&gt;UI에 대해&lt;/h4&gt;
+&lt;p&gt;다음으로 집약팀은 시각장애인이 선호하는 UI를 파악하려고 노력했습니다. &lt;br /&gt;
+&lt;img src=&quot;https://prography-tech.github.io/assets/posts/zipyak/app-ui-for-bilind.png&quot; alt=&quot;app-ui-for-blind&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;맨 왼쪽부터 ‘행복을 들려주는 도서관’, ‘Be my eyes’, ‘설리번 플러스’ 시각장애인들이 많이 사용하는 3가지 어플리케이션입니다. 이러한 어플리케이션들은 평소에 사용하는 어플리케이션과 UI가 다른 것을 눈치채셨나요? 이 어플리케이션들의 특징은 다음과 같습니다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;글자는 24pt 이상 글자과 배경의 색은 대비되도록&lt;/li&gt;
+  &lt;li&gt;단순한 메뉴배치&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;왜 이러한 규칙들이 있을까요? 이 규칙들은 시각장애인들의 어플리케이션 사용방식과 연관이 있습니다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;시각장애인은 크게 약시와 전맹으로 구분됩니다.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;약시인 시각장애인은 앞이 아예 안보이지는 않기 때문에 스마트폰에 화면 밝기를 최대로 키우고 내장되어있는 돋보기를 사용하여 스마트폰을 눈 가까이에 가져가 스마트폰을 조작합니다. 이를 고려하여 글자는 24pt 이상 글자과 배경의 색은 대비되도록 UI를 구성해 약시인 시각장애인을 고려한 UI를 구성할 수 있습니다.&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;전맹인 시각장애인은 스크린리더를 통해 스마트폰 화면을 파악합니다.&lt;br /&gt;
+이 스크린 리더는 손으로 스마트폰 화면을 좌우로 넘겨 Component를 변경합니다. 이때 예측가능한 Component 변경을 위해 단순한 메뉴배치를 사용합니다.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h4 id=&quot;ux에-대해&quot;&gt;UX에 대해&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://prography-tech.github.io/assets/posts/zipyak/search-method-compare.png&quot; alt=&quot;search-method-compare&quot; /&gt;
+시각장애인들의 약 구분을 위해 사진을 찍고 찍은 사진을 통해 검색을 하는 기능을 넣기로 했고 이 기능을 만드는 것에 대한 두 가지 방안이 존재했습니다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;바코드로 검색한다.&lt;/li&gt;
+  &lt;li&gt;약표지에 적혀있는 글자를 사용해 검색한다.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;바코드를 사용하면 검색에 대한 정확도를 보장할 수 있습니다. 하지만 집약팀은 시각장애인이 약상자에서 바코드가 어디에 있는지 알 수 없다고 판단해 1번 방법이 아닌 2번 방법을 채택하기로 했습니다.&lt;/p&gt;
+
+&lt;h2 id=&quot;사용자의-피드백&quot;&gt;사용자의 피드백&lt;/h2&gt;
+&lt;h3 id=&quot;제품을-만든-후의-실사용자의-피드백&quot;&gt;제품을 만든 후의 실사용자의 피드백&lt;/h3&gt;
+&lt;p&gt;자! 이렇게 집약이라는 어플리케이션이 탄생했습니다. 이후 집약팀이 만든 서비스가 실제로 유용한지 확인하기 위해 시각장애인 모임에 연락을 해서 테스트 및 인터뷰를 진행했습니다. 하지만 개발단계에서 예상하지 못한 문제가 발생했습니다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;선천적 시각장애인은 사진찍는 것에 익숙하지 않다.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;선천적 시각장애인은 사진을 찍어볼 기회가 거의 없습니다. 따라서 피사체와 거리를 얼마나 두어야 하는지, 사진을 어떻게 찍어야하는지 몰라 피사체를 핸드폰에 붙혀서 사진을 찍거나, 카메라 렌즈를 손으로 가려 사진을 찍었습니다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;내가 예상한 어플리케이션 사용방법과 사용자의 어플리케이션 사용 방법이 다르다.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;검색을 위해 사진을 찍을 때 집약팀은 편한 사용성을 위해 화면중 아무곳이나 클릭하여 사지을 찍을 수 있도록 했습니다. 하지만 사용자는 주변에 가져가기만 해도 사진이 찍히는 것으로 생각해 어플리케이션이 정상작동이 안된다고 결론을 내렸습니다.&lt;/p&gt;
+
+&lt;h3 id=&quot;집약만의-차이점&quot;&gt;집약만의 차이점?&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&quot;https://prography-tech.github.io/assets/posts/zipyak/barcode.jpg&quot; alt=&quot;barcode&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;사실 이 서비스를 만드는 도중 2019년 10월 중반에 시각장애인을 위한 약학정보서비스가 나왔습니다. 인터뷰를 진행했을 때고 이러한 이야기가 나왔습니다. 이 서비스를 A리고 하겠습니다. A는 이전의 어플리케이션과 달리 이 어플리케이션은 스크린리더를 제대로 고려해 어플리케이션을 제작했습니다. 그에 대항하기 위해 집약은 A와 차별점을 두었습니다. A는 바코드를 이용해 사진으로 검색을 할 수 있지만 인터뷰를 진행하는 도중 바코드를 찾을 수 없어 A서비스의 바코드로 검색하는 기능을 사용할 수 없다고 했습니다. 집약은 이와 차별을 두기 위해 비교적 사진을 찍기 쉬운 약상자의 겉표지를 분석해 약을 검색을 할 수 있 했습니다..&lt;/p&gt;
+
+&lt;h2 id=&quot;마무리&quot;&gt;마무리&lt;/h2&gt;
+&lt;p&gt;집약이라는 어플리케이션을 기획하고 제작하면서 사용자에 대한 고민을 많이 하게 되었고, 이를 바탕으로 만족스러운 결과를 만들어냈고 출시를 했습니다. 결과적으로 앱개발대회에서 3등을 했고 많은 경험을 했습니다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://scontent-ssn1-1.xx.fbcdn.net/v/t1.6435-9/83826506_127775198760864_4639657637187682304_n.png?_nc_cat=108&amp;amp;ccb=1-5&amp;amp;_nc_sid=730e14&amp;amp;_nc_ohc=uxKipAcQLWYAX9ZeEjS&amp;amp;_nc_ht=scontent-ssn1-1.xx&amp;amp;oh=e30b574101a5043b72ec5597ce46d774&amp;amp;oe=61B1BFDC&quot; alt=&quot;집약&quot; /&gt;&lt;/p&gt;</content><author><name>wonbeomjang</name></author><summary type="html">저는 친구와 함께 시각장애인을 위한 약학정보 서비스를 기획하고 개발했습니다. 서비스를 기획하면서 많은 조사와 인터뷰를 진행해 그 경험을 나누고자 합니다. 우리는 집에 여러개의 상비약들이 있습니다. 우리는 약상자를 보고 원하는 약을 찾을 수 있지만 시각장애인분들은 찾을 수 있을까요? 저희는 이러한 문제에 주목했고 ‘집에 있는 약을 구분을 할 수 있도록 하자’는 생각으로 서비스를 기획하게 되었습니다. 서비스 기획 인터뷰의 필요성 처음에는 약학정보 서비스가 아닌 시각장애인을 위한 코디추천 서비스를 기획했습니다. 시각장애인들은 눈이 안보이니 자신이 가지고 있는 옷이 무엇인지 코디를 어떻게 할지 모를거라고 생각했고 여러 논문을 찾아보니 시각장애인들은 기억력의 한계 때문에 비시각장애인보다 옷을 적게 갖고있다고 했습니다. 그래서 시각장애인을 위한 코디추천 서비스를 열심히 기획해 기획안을 들고 한 시각장애인분께 부탁을 드려 인터뷰를 진행하기로 했습니다. 인터뷰를 하던 도중 생각했던 것이 그저 가설이라는 것을 알게되었습니다. 인터뷰 중에 얻었던 내용은 다음과 같습니다. 자신이 산 옷은 기억한다. 보관중인 옷은 만져보면 무슨 옷인지 알 수 있다. 옷을 살 떄 세트로 코디를 하면서 사 패션에 대해 그렇게 신경쓰지 않는다. 즉 이 서비스에 대한 Needs가 크지 않다는 것입니다. 기획 변경 소비자의 환경을 파악하라 인터뷰를 하던 도중 약학정보를 얻기 힘들다는 이야기를 들었습니다. 그 소리를 듣는 순간 사용할 수 있는 서비스가 없나? 라는 생각이 들었고 앱스토어서 관련서비스를 찾아봤고 iOS 모바일 어플리케이션에서 시각장애인이 사용할 수 있는 서비스가 없었습니다. 많은 어플리케이션은 label을 만들 때 다음과 같이 만듭니다. 이러한 labeling이 왜 문제가 될까요? 시각장애인들은 Voice Assistance나 Voice Over와 같은 스크린 리더를 통해 화면을 읽습니다. 이 스크린 리더는 Componentent들의 label이나 text 값을 읽어주기 때문에 이것을 고려를 안하고 앱을 제작하면 시각장애인들이 쓸 수 없게 됩니다. 여러 인터뷰와 회의를 통해 시각장애인을 위한 코디서비스가 아닌 시각장애인을 위한 약학정보제공서비스로 기획을 변경하게 되었습니다. 시각장애인을 위한 UI/UX UI에 대해 다음으로 집약팀은 시각장애인이 선호하는 UI를 파악하려고 노력했습니다. 맨 왼쪽부터 ‘행복을 들려주는 도서관’, ‘Be my eyes’, ‘설리번 플러스’ 시각장애인들이 많이 사용하는 3가지 어플리케이션입니다. 이러한 어플리케이션들은 평소에 사용하는 어플리케이션과 UI가 다른 것을 눈치채셨나요? 이 어플리케이션들의 특징은 다음과 같습니다. 글자는 24pt 이상 글자과 배경의 색은 대비되도록 단순한 메뉴배치 왜 이러한 규칙들이 있을까요? 이 규칙들은 시각장애인들의 어플리케이션 사용방식과 연관이 있습니다. 시각장애인은 크게 약시와 전맹으로 구분됩니다. 약시인 시각장애인은 앞이 아예 안보이지는 않기 때문에 스마트폰에 화면 밝기를 최대로 키우고 내장되어있는 돋보기를 사용하여 스마트폰을 눈 가까이에 가져가 스마트폰을 조작합니다. 이를 고려하여 글자는 24pt 이상 글자과 배경의 색은 대비되도록 UI를 구성해 약시인 시각장애인을 고려한 UI를 구성할 수 있습니다. 전맹인 시각장애인은 스크린리더를 통해 스마트폰 화면을 파악합니다. 이 스크린 리더는 손으로 스마트폰 화면을 좌우로 넘겨 Component를 변경합니다. 이때 예측가능한 Component 변경을 위해 단순한 메뉴배치를 사용합니다. UX에 대해 시각장애인들의 약 구분을 위해 사진을 찍고 찍은 사진을 통해 검색을 하는 기능을 넣기로 했고 이 기능을 만드는 것에 대한 두 가지 방안이 존재했습니다. 바코드로 검색한다. 약표지에 적혀있는 글자를 사용해 검색한다. 바코드를 사용하면 검색에 대한 정확도를 보장할 수 있습니다. 하지만 집약팀은 시각장애인이 약상자에서 바코드가 어디에 있는지 알 수 없다고 판단해 1번 방법이 아닌 2번 방법을 채택하기로 했습니다. 사용자의 피드백 제품을 만든 후의 실사용자의 피드백 자! 이렇게 집약이라는 어플리케이션이 탄생했습니다. 이후 집약팀이 만든 서비스가 실제로 유용한지 확인하기 위해 시각장애인 모임에 연락을 해서 테스트 및 인터뷰를 진행했습니다. 하지만 개발단계에서 예상하지 못한 문제가 발생했습니다. 선천적 시각장애인은 사진찍는 것에 익숙하지 않다. 선천적 시각장애인은 사진을 찍어볼 기회가 거의 없습니다. 따라서 피사체와 거리를 얼마나 두어야 하는지, 사진을 어떻게 찍어야하는지 몰라 피사체를 핸드폰에 붙혀서 사진을 찍거나, 카메라 렌즈를 손으로 가려 사진을 찍었습니다. 내가 예상한 어플리케이션 사용방법과 사용자의 어플리케이션 사용 방법이 다르다. 검색을 위해 사진을 찍을 때 집약팀은 편한 사용성을 위해 화면중 아무곳이나 클릭하여 사지을 찍을 수 있도록 했습니다. 하지만 사용자는 주변에 가져가기만 해도 사진이 찍히는 것으로 생각해 어플리케이션이 정상작동이 안된다고 결론을 내렸습니다. 집약만의 차이점? 사실 이 서비스를 만드는 도중 2019년 10월 중반에 시각장애인을 위한 약학정보서비스가 나왔습니다. 인터뷰를 진행했을 때고 이러한 이야기가 나왔습니다. 이 서비스를 A리고 하겠습니다. A는 이전의 어플리케이션과 달리 이 어플리케이션은 스크린리더를 제대로 고려해 어플리케이션을 제작했습니다. 그에 대항하기 위해 집약은 A와 차별점을 두었습니다. A는 바코드를 이용해 사진으로 검색을 할 수 있지만 인터뷰를 진행하는 도중 바코드를 찾을 수 없어 A서비스의 바코드로 검색하는 기능을 사용할 수 없다고 했습니다. 집약은 이와 차별을 두기 위해 비교적 사진을 찍기 쉬운 약상자의 겉표지를 분석해 약을 검색을 할 수 있 했습니다.. 마무리 집약이라는 어플리케이션을 기획하고 제작하면서 사용자에 대한 고민을 많이 하게 되었고, 이를 바탕으로 만족스러운 결과를 만들어냈고 출시를 했습니다. 결과적으로 앱개발대회에서 3등을 했고 많은 경험을 했습니다.</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://wonbeomjang.github.io/assets/posts/zipyak/zipyak-icon.png" /></entry><entry><title type="html">학부생이 보는 GAN</title><link href="http://localhost:4000/computer%20vision/2019/09/15/%ED%95%99%EB%B6%80%EC%83%9D%EC%9D%B4-%EB%B3%B4%EB%8A%94-gan/" rel="alternate" type="text/html" title="학부생이 보는 GAN" /><published>2019-09-15T18:50:11+09:00</published><updated>2019-09-15T18:50:11+09:00</updated><id>http://localhost:4000/computer%20vision/2019/09/15/%ED%95%99%EB%B6%80%EC%83%9D%EC%9D%B4-%EB%B3%B4%EB%8A%94-gan</id><content type="html" xml:base="http://localhost:4000/computer%20vision/2019/09/15/%ED%95%99%EB%B6%80%EC%83%9D%EC%9D%B4-%EB%B3%B4%EB%8A%94-gan/">&lt;p&gt;논문 링크: &lt;a href=&quot;https://arxiv.org/pdf/1406.2661.pdf&quot;&gt;Ganerative Adversarial Network&lt;/a&gt;&lt;br /&gt;&lt;br /&gt;
+GAN은 2014년도에 나온 논문으로 현재 많은 연구에 영향을 끼치고 있고 Yann LeCun이 혁명적인 아이디어라고 극찬한했다. GAN은 Image Generation에 관한 기초 모델로 이를 활용해 늙은 사진, 언경쓴 사진 등 원하는 이미지를 만들어낼 수 있다.&lt;/p&gt;
+&lt;h2 id=&quot;contribution&quot;&gt;Contribution&lt;/h2&gt;
+&lt;p&gt;이 논문에 Contribution은 다음과 같다.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;이후 연구가 활발히 진행되는 GAN의 기본적인 이론적인 개념을 제시했다.&lt;/li&gt;
+  &lt;li&gt;ganerate된 이미지는 하나의 지점으로 수렴하며 이 지점은 하나뿐인 global optimum이라는 것을 증명했다.
+    &lt;h2 id=&quot;basic-concept&quot;&gt;Basic Concept&lt;/h2&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;“Adversarial”이라는 단어는 적대적인 이라는 뜻을 갖습니다. 논문 제목에서 알 수 있듯 이 논문에서 두 네트워크는 서로 적대적인 관계에 있으며 서로 경쟁하면서 학습해 나간다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://t4.daumcdn.net/thumb/R720x0/?fname=http://t1.daumcdn.net/brunch/service/user/1oU7/image/CxJSZ32137590w5Aeo4Yeg-m8dg.png&quot; alt=&quot;GAN 경찰 도둑&quot; width=&quot;100%&quot; height=&quot;100%&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;다음 두 네트워크 Generator, Discriminator가 있다. Generator는 이미지를 만들어내는 네트워크이고 Discriminator는 이미지들이 Generator에서 만들어진 이미지인지 실제 데이터셋에 있는 실제 이미지인지 구분한다. GAN 논문에서는 이것을 지폐위조범과 경찰로 묘사했다.&lt;/p&gt;
+
+&lt;p&gt;지폐위조범인 Generator 들킬 위험이 없는 위조지폐를 만드는 것이 목표다. 그리고 경찰인 Discriminator는 이 위조지폐를 찾아내는 것을 목표로 하고있습니다. 이러한 상황에서 각각의 네트워크들은 자신들의 성능들을 높일것이고 결과적으로 위조지폐가 완벽해서 실제지폐와 구분 할 수 없다. (p=0.5)&lt;/p&gt;
+
+&lt;p&gt;수학적으로 접근해보면 다음과 같다. Generator는 우리가 갖고있는 data들의 distribution을 모사한다. real data를 &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;, Generator가 입력으로 z를 받아 뽑은 Sample data를 &lt;script type=&quot;math/tex&quot;&gt;G(z))&lt;/script&gt;라 하겠다. (z는 보통 Gaussian noise이다,) 만약 Discriminator가 잘 학습이 되 었다면 &lt;script type=&quot;math/tex&quot;&gt;D(x)=1, D(G(z))=0&lt;/script&gt;이 될 것이고, Generator가 학습니 잘 된다면 D(G(z))=1이 될 것이다. Discriminator는 minimum으로 Generator는 maximun으로 각각 경쟁하며 학습해서 해서 min-max problem이다.&lt;/p&gt;
+
+&lt;h3 id=&quot;loss-function&quot;&gt;Loss Function&lt;/h3&gt;
+&lt;p&gt;위를 수식으로 정의하면 다음과 같다.&lt;/p&gt;
+
+&lt;center&gt;
+$$min_G max_D V(D,G) = E_{x~p_{data}}[logD(x)] + E_{x~p_z(z)}[log(1-D(G(z)))]$$
+&lt;/center&gt;
+
+&lt;p&gt;이해가 잘 안된다면 극단적으로 접근하면 됩니다. Discriminator가 학습이 잘 되었다면 &lt;script type=&quot;math/tex&quot;&gt;D(x)=1, D(G(z))=0&lt;/script&gt;가 될 것이고, 결과적으로 &lt;script type=&quot;math/tex&quot;&gt;V(D,G)=0&lt;/script&gt;으로 maximum이 될 것이다. 반대로 Generator가 학습니 잘 되었다면 &lt;script type=&quot;math/tex&quot;&gt;D(G(z))=1&lt;/script&gt;이 될 것이고 &lt;script type=&quot;math/tex&quot;&gt;V(D,G)=-\infty&lt;/script&gt;로 minimun이 될 것이다.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://1.bp.blogspot.com/-_ZpVHCkqwJI/WHjwzlgki8I/AAAAAAAABKk/e3xQukjtHBoxoQyLA7Fn-GhL7t8mgBFMwCK4B/s640/%25EA%25B7%25B8%25EB%25A6%25BC5.PNG&quot; alt=&quot;Gan distrivution&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;GAN 논문에서 제시하고 있는 Distribution인데요. 검은색 점선은 real data distribution, 초록색 점선은 Generator distribution, 보라색 접선은 Discriminator distribution입니다. 초기상태 (a)에서는 비교적 Discriminator가 real data와 sample data를 잘 판별했으나 학습이 될 수록 real data와 sample data의 distribution이 비슷해져 Discriminator가 각각의 입력을 받았을 때, 출력하는 예측값은 0.5가 됩니다.&lt;/p&gt;
+
+&lt;h3 id=&quot;global-optimality-p_gp_data&quot;&gt;Global Optimality &lt;script type=&quot;math/tex&quot;&gt;p_g=p_{data}&lt;/script&gt;&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;Proposition 1.&lt;/strong&gt;
+generator G가 고정되었을때 최적의 dicriminator D는&lt;/p&gt;
+&lt;center&gt;
+$$D^*_G(x)=\frac {p_{data}(x)}{p_{data} + p_g(x)}$$
+&lt;/center&gt;
+
+&lt;p&gt;&lt;strong&gt;Proof.&lt;/strong&gt;&lt;/p&gt;
+&lt;center&gt;
+$$min_G max_D V(D,G) = E_{x~p_{data}}[logD(x)] + E_{x~p_z(z)}[log(1-D(G(z)))]$$
+$$V(G,D)=\int_x p_{data}(x)log(D(x))dx + \int_zp_z(z)log(1-D(G(z)))dz$$ 
+$$V(G,D)=\int_x p_{data}(x)log(D(x)) + p_z(z)log(1-D(G(z)))dz$$
+&lt;/center&gt;
+
+&lt;p&gt;어떤 &lt;script type=&quot;math/tex&quot;&gt;(a, b) \in R^2\setminus\{0,0\}&lt;/script&gt;에서, 함수 &lt;script type=&quot;math/tex&quot;&gt;y \rightarrow alog(y) + blog(y)&lt;/script&gt;는 [0, 1]범위에서 최댓값 &lt;script type=&quot;math/tex&quot;&gt;\frac{a}{a+b}&lt;/script&gt;을 갖는다.&lt;/p&gt;
+
+&lt;p&gt;위의 식을 다음과 같이 변형할 수 있다.&lt;/p&gt;
+
+&lt;center&gt;
+$$C(G)= max_D(G,D)$$  
+$$ = E_{x~p_{data}}[logD^*_G(x)] + E_{x~p_z(z)}[log(1-D^*_G(G(z)))]$$
+$$ = E_{x~p_{data}}[logD^*_G(x)] + E_{x~p_z(z)}[log(1-D^*_G(x))]$$
+$$ = E_{x~p_{data}}[log\frac {p_{data}(x)}{p_{data} + p_g(x)}] 
++ E_{x~p_z(z)}[log\frac {p_{g}(x)}{p_{data} + p_g(x)}]$$
+&lt;/center&gt;
+
+&lt;p&gt;&lt;strong&gt;Theorem 1.&lt;/strong&gt;&lt;br /&gt;
+&lt;script type=&quot;math/tex&quot;&gt;C(G)&lt;/script&gt;의 global minimum은 오직 &lt;script type=&quot;math/tex&quot;&gt;p_g=p_{data}&lt;/script&gt;뿐이고, 이때 &lt;script type=&quot;math/tex&quot;&gt;C(G)=-log4&lt;/script&gt;이다.&lt;/p&gt;
+
+&lt;p&gt;직관적으로 생각했을 때 &lt;script type=&quot;math/tex&quot;&gt;p_g=p_{data}&lt;/script&gt;이면 &lt;script type=&quot;math/tex&quot;&gt;D^*_G(G)=\frac {1}{2}&lt;/script&gt;이다.&lt;/p&gt;
+&lt;center&gt;
+$$C(G)=E_{x~p_{data}}[-log2] + E_{x~p_z(z)}[-log2] = -log4$$
+&lt;/center&gt;
+
+&lt;p&gt;이를 다음과 같이 생각할 수 있다.&lt;/p&gt;
+
+&lt;center&gt;
+$$E_{x~data}[log\frac {p_{data}(x)}{p_{data} + p_g(x)}] + E_{x~p_g}[log\frac {p_{g}(x)}{p_{data} + p_g(x)}]$$ 
+
+$$C(G)=-log(4) + KL(p_{data}||\frac{p_{data} + p_g}{2}) + KL(p_{g}||\frac{p_{data} + p_g}{2})$$
+
+$$C(G)=-log(4) + 2*JSD(p_{data}||p_{g})$$
+&lt;/center&gt;
+
+&lt;p&gt;Jensen-Shannon divergence의 범위는 &lt;script type=&quot;math/tex&quot;&gt;[0, \infty]&lt;/script&gt;이이고 그 최소점은 &lt;script type=&quot;math/tex&quot;&gt;p_{g}=p_{data}&lt;/script&gt;이다. 따라서 C(G)의 최소값은 &lt;script type=&quot;math/tex&quot;&gt;-log(4)&lt;/script&gt;이다.&lt;/p&gt;
+
+&lt;h3 id=&quot;convergence-of-algorithm&quot;&gt;Convergence of Algorithm&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Proposition 2.&lt;/strong&gt;
+만약 G과 D가 gradient decent알고리즘으로 충분히 학습된다면 D는 다음 식에서 주어진 G과 &lt;script type=&quot;math/tex&quot;&gt;p_g&lt;/script&gt;에대해 optimum에 도달하게 된다.&lt;/p&gt;
+&lt;center&gt;
+$$ = E_{x~p_{data}}[logD^*_G(x)] + E_{x~p_z(z)}[log(1-D^*_G(G(z)))]$$
+&lt;/center&gt;
+
+&lt;p&gt;&lt;strong&gt;Proof&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;if &lt;script type=&quot;math/tex&quot;&gt;f(p_g)=sup_{D\in}f_D(p_g)&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;f_D(p_g)&lt;/script&gt; is convex in &lt;script type=&quot;math/tex&quot;&gt;p_g&lt;/script&gt; every &lt;script type=&quot;math/tex&quot;&gt;D&lt;/script&gt;, then &lt;script type=&quot;math/tex&quot;&gt;\vartheta f_{D^*}(p_g) \in \vartheta f&lt;/script&gt; if &lt;script type=&quot;math/tex&quot;&gt;D^*=argsup_{D\in D}f_D(p_g)&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;여기서 &lt;script type=&quot;math/tex&quot;&gt;f_D(p_g)&lt;/script&gt;는 앞에서 살펴본 &lt;script type=&quot;math/tex&quot;&gt;C(G)&lt;/script&gt;와 같습니다. &lt;script type=&quot;math/tex&quot;&gt;C(G)&lt;/script&gt;는 JS divergence으로 convex함수입니다. 이때 모든 D에서 이 식은 성립하므로 D의 optimal인 f_{D^*}(p_g)도 convex함수이다. 따라서 우리가 풀고자하는 문제가 convex함수이기 때문에 gradient decent알고지음을 사용하면 global optimum에 도달한다.&lt;/p&gt;
+
+&lt;h3 id=&quot;limitation&quot;&gt;Limitation&lt;/h3&gt;
+&lt;p&gt;앞서 살펴본 내용들을 생각한다면 혁신적인 아이디어는 맞다. 하지만 모든 초기연구가 그렇듯 한계가 있다.&lt;/p&gt;
+
+&lt;h4 id=&quot;unstable&quot;&gt;Unstable&lt;/h4&gt;
+&lt;p&gt;사실 Loss함수 입장에서보면 minimum이든 maximum이든 어느쪽으로가든 상관이 없다. 즉&lt;/p&gt;
+&lt;center&gt;
+$$min_G max_D V(D,G) = E_{x~p_{data}}[logD(x)] + E_{x~p_z(z)}[log(1-D(G(z)))]$$
+&lt;/center&gt;
+&lt;p&gt;여기서 Generator를 잘 학습시키는 것 대신 Discriminator를 잘 속이는 것으로 학습방향이 흘러갈수있다. 예를들어 mnist dataset에서 Generator는 Discriminator를 잘 속이기 위해 숫자 6만 만들어낸다고 하자. 그러면 Discriminator는 숫자 6이 나오면 Generator에서 나오는 것으로 판단하고 6이라는 이미지는 fake image라고 판단한다. 이후 Generator는 Discriminator의 판단을 속이기 위해 8을 만들어낼 것이고, 앞선 상황이 반복될 것이다.&lt;/p&gt;</content><author><name></name></author><summary type="html">논문 링크: Ganerative Adversarial Network GAN은 2014년도에 나온 논문으로 현재 많은 연구에 영향을 끼치고 있고 Yann LeCun이 혁명적인 아이디어라고 극찬한했다. GAN은 Image Generation에 관한 기초 모델로 이를 활용해 늙은 사진, 언경쓴 사진 등 원하는 이미지를 만들어낼 수 있다. Contribution 이 논문에 Contribution은 다음과 같다. 이후 연구가 활발히 진행되는 GAN의 기본적인 이론적인 개념을 제시했다. ganerate된 이미지는 하나의 지점으로 수렴하며 이 지점은 하나뿐인 global optimum이라는 것을 증명했다. Basic Concept “Adversarial”이라는 단어는 적대적인 이라는 뜻을 갖습니다. 논문 제목에서 알 수 있듯 이 논문에서 두 네트워크는 서로 적대적인 관계에 있으며 서로 경쟁하면서 학습해 나간다. 다음 두 네트워크 Generator, Discriminator가 있다. Generator는 이미지를 만들어내는 네트워크이고 Discriminator는 이미지들이 Generator에서 만들어진 이미지인지 실제 데이터셋에 있는 실제 이미지인지 구분한다. GAN 논문에서는 이것을 지폐위조범과 경찰로 묘사했다. 지폐위조범인 Generator 들킬 위험이 없는 위조지폐를 만드는 것이 목표다. 그리고 경찰인 Discriminator는 이 위조지폐를 찾아내는 것을 목표로 하고있습니다. 이러한 상황에서 각각의 네트워크들은 자신들의 성능들을 높일것이고 결과적으로 위조지폐가 완벽해서 실제지폐와 구분 할 수 없다. (p=0.5) 수학적으로 접근해보면 다음과 같다. Generator는 우리가 갖고있는 data들의 distribution을 모사한다. real data를 , Generator가 입력으로 z를 받아 뽑은 Sample data를 라 하겠다. (z는 보통 Gaussian noise이다,) 만약 Discriminator가 잘 학습이 되 었다면 이 될 것이고, Generator가 학습니 잘 된다면 D(G(z))=1이 될 것이다. Discriminator는 minimum으로 Generator는 maximun으로 각각 경쟁하며 학습해서 해서 min-max problem이다. Loss Function 위를 수식으로 정의하면 다음과 같다. $$min_G max_D V(D,G) = E_{x~p_{data}}[logD(x)] + E_{x~p_z(z)}[log(1-D(G(z)))]$$ 이해가 잘 안된다면 극단적으로 접근하면 됩니다. Discriminator가 학습이 잘 되었다면 가 될 것이고, 결과적으로 으로 maximum이 될 것이다. 반대로 Generator가 학습니 잘 되었다면 이 될 것이고 로 minimun이 될 것이다. GAN 논문에서 제시하고 있는 Distribution인데요. 검은색 점선은 real data distribution, 초록색 점선은 Generator distribution, 보라색 접선은 Discriminator distribution입니다. 초기상태 (a)에서는 비교적 Discriminator가 real data와 sample data를 잘 판별했으나 학습이 될 수록 real data와 sample data의 distribution이 비슷해져 Discriminator가 각각의 입력을 받았을 때, 출력하는 예측값은 0.5가 됩니다. Global Optimality Proposition 1. generator G가 고정되었을때 최적의 dicriminator D는 $$D^*_G(x)=\frac {p_{data}(x)}{p_{data} + p_g(x)}$$ Proof. $$min_G max_D V(D,G) = E_{x~p_{data}}[logD(x)] + E_{x~p_z(z)}[log(1-D(G(z)))]$$ $$V(G,D)=\int_x p_{data}(x)log(D(x))dx + \int_zp_z(z)log(1-D(G(z)))dz$$ $$V(G,D)=\int_x p_{data}(x)log(D(x)) + p_z(z)log(1-D(G(z)))dz$$ 어떤 에서, 함수 는 [0, 1]범위에서 최댓값 을 갖는다. 위의 식을 다음과 같이 변형할 수 있다. $$C(G)= max_D(G,D)$$ $$ = E_{x~p_{data}}[logD^*_G(x)] + E_{x~p_z(z)}[log(1-D^*_G(G(z)))]$$ $$ = E_{x~p_{data}}[logD^*_G(x)] + E_{x~p_z(z)}[log(1-D^*_G(x))]$$ $$ = E_{x~p_{data}}[log\frac {p_{data}(x)}{p_{data} + p_g(x)}] + E_{x~p_z(z)}[log\frac {p_{g}(x)}{p_{data} + p_g(x)}]$$ Theorem 1. 의 global minimum은 오직 뿐이고, 이때 이다. 직관적으로 생각했을 때 이면 이다. $$C(G)=E_{x~p_{data}}[-log2] + E_{x~p_z(z)}[-log2] = -log4$$ 이를 다음과 같이 생각할 수 있다. $$E_{x~data}[log\frac {p_{data}(x)}{p_{data} + p_g(x)}] + E_{x~p_g}[log\frac {p_{g}(x)}{p_{data} + p_g(x)}]$$ $$C(G)=-log(4) + KL(p_{data}||\frac{p_{data} + p_g}{2}) + KL(p_{g}||\frac{p_{data} + p_g}{2})$$ $$C(G)=-log(4) + 2*JSD(p_{data}||p_{g})$$ Jensen-Shannon divergence의 범위는 이이고 그 최소점은 이다. 따라서 C(G)의 최소값은 이다. Convergence of Algorithm Proposition 2. 만약 G과 D가 gradient decent알고리즘으로 충분히 학습된다면 D는 다음 식에서 주어진 G과 에대해 optimum에 도달하게 된다. $$ = E_{x~p_{data}}[logD^*_G(x)] + E_{x~p_z(z)}[log(1-D^*_G(G(z)))]$$ Proof if and is convex in every , then if 여기서 는 앞에서 살펴본 와 같습니다. 는 JS divergence으로 convex함수입니다. 이때 모든 D에서 이 식은 성립하므로 D의 optimal인 f_{D^*}(p_g)도 convex함수이다. 따라서 우리가 풀고자하는 문제가 convex함수이기 때문에 gradient decent알고지음을 사용하면 global optimum에 도달한다. Limitation 앞서 살펴본 내용들을 생각한다면 혁신적인 아이디어는 맞다. 하지만 모든 초기연구가 그렇듯 한계가 있다. Unstable 사실 Loss함수 입장에서보면 minimum이든 maximum이든 어느쪽으로가든 상관이 없다. 즉 $$min_G max_D V(D,G) = E_{x~p_{data}}[logD(x)] + E_{x~p_z(z)}[log(1-D(G(z)))]$$ 여기서 Generator를 잘 학습시키는 것 대신 Discriminator를 잘 속이는 것으로 학습방향이 흘러갈수있다. 예를들어 mnist dataset에서 Generator는 Discriminator를 잘 속이기 위해 숫자 6만 만들어낸다고 하자. 그러면 Discriminator는 숫자 6이 나오면 Generator에서 나오는 것으로 판단하고 6이라는 이미지는 fake image라고 판단한다. 이후 Generator는 Discriminator의 판단을 속이기 위해 8을 만들어낼 것이고, 앞선 상황이 반복될 것이다.</summary></entry></feed>

@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+<meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
+
+
+<meta name="description" content="파이썬에서는 유용한 자료구조 라이브러리를 제공합니다. 
+그 중에 하나는 우선순위 큐(priority queue)입니다.
+
+우선순위 큐란?
+우리는 많은 경우에서 우선순위를 만납니다.
+응급실의 예를 들어보겠습니다.
+다음의 환자들이 있습니다. 
+스케쥴링을 이야기할 것이 아니기 때문에 치료 시간은 0으로 가정하겠습니다.
+
+
+  5분 이내 치료해야할 사람
+  10분 이내 치료해야할 사람
+  2분 이내 치료해야할 사람
+
+
+우리는 위의 환자의 치료 순위를 어떻게 정해야합니까?
+3 -&gt; 1 -&gt; 2순으로 치료해야 할 것입니다. 
+위의 상황을 해결해주는 자료구조가 우선순위 큐입니다.
+
+구현 방법은 이 글에서 다루지 않겠습니다.
+
+파이썬 라이브러리
+파이썬에서는 heapq, PriorityQueue로 우선순위 큐를 지원합니다.
+사용법은 다음과 같습니다.
+
+heapq
+import heapq
+
+pq = []
+
+heapq.heappush(pq, 1)
+heapq.heappush(pq, 3)
+heapq.heappush(pq, 2)
+
+heapq.heappop(pq) # 1
+heapq.heappop(pq) # 2
+heapq.heappop(pq) # 3
+
+
+PriorityQueue
+from queue import PriorityQueue
+
+pq = PriorityQueue()
+
+pq.put(1)
+pq.put(3)
+pq.put(2)
+
+pq.get() # 1
+pq.get() # 2
+pq.get() # 3
+
+
+다음과 같은 의문이 들 수 있습니다.
+똑같은 역할을 하는데 과연 두 라이브러리들은 무엇이 다를까?
+
+PriorityQueue는 객체이고 heapq는 여러 함수들이 들어있는 파일입니다.
+맞는 말이긴 합니다.
+
+정확하게 말하면 PriorityQueue은 lock을 제공하여 thread-safty class입니다.
+반면에 heapq는 list를 사용하기 때문에 thread-safty class가 아닙니다.
+
+그래서 그런지 몰라도 실행시킬 때 실행속도가 차이가 납니다. (제 추측…)
+
+실행속도 비교
+t2.micro에서 실험을 진행했습니다.
+
+Duration of PriorityQueue 0.980911
+Duration of heapq         0.175374
+
+
+코드
+from queue import PriorityQueue
+import heapq
+import random
+from time import time
+
+nums = [random.random() for _ in range(100000)]
+
+priority_queue = PriorityQueue()
+pq = []
+
+start = time()
+for i in range(len(nums)):
+    priority_queue.put(nums[i])
+
+for i in range(len(nums)):
+    priority_queue.get()
+end = time()
+print(f'Duration of PriorityQueue {end - start:.6f}')
+
+
+start = time()
+for i in range(len(nums)):
+    heapq.heappush(pq, nums[i])
+
+for i in range(len(nums)):
+    heapq.heappop(pq)
+end = time()
+print(f'Duration of heapq         {end - start:.6f}')
+
+
+마치며
+사실 이 라이브러리는 백준 보석도둑을 풀면서 알게되었습니다.
+알고리즘문제를 풀때 heapq를 써야지 PriorityQueue를 쓰면 시간초과가 결렸습니다.
+다들 저와 같은 실수를 하지 않길 빌면서 이만 가보도록 하겠습니다.
+알고리즘 어렵다!
+" />
+<meta property="og:description" content="파이썬에서는 유용한 자료구조 라이브러리를 제공합니다. 
+그 중에 하나는 우선순위 큐(priority queue)입니다.
+
+우선순위 큐란?
+우리는 많은 경우에서 우선순위를 만납니다.
+응급실의 예를 들어보겠습니다.
+다음의 환자들이 있습니다. 
+스케쥴링을 이야기할 것이 아니기 때문에 치료 시간은 0으로 가정하겠습니다.
+
+
+  5분 이내 치료해야할 사람
+  10분 이내 치료해야할 사람
+  2분 이내 치료해야할 사람
+
+
+우리는 위의 환자의 치료 순위를 어떻게 정해야합니까?
+3 -&gt; 1 -&gt; 2순으로 치료해야 할 것입니다. 
+위의 상황을 해결해주는 자료구조가 우선순위 큐입니다.
+
+구현 방법은 이 글에서 다루지 않겠습니다.
+
+파이썬 라이브러리
+파이썬에서는 heapq, PriorityQueue로 우선순위 큐를 지원합니다.
+사용법은 다음과 같습니다.
+
+heapq
+import heapq
+
+pq = []
+
+heapq.heappush(pq, 1)
+heapq.heappush(pq, 3)
+heapq.heappush(pq, 2)
+
+heapq.heappop(pq) # 1
+heapq.heappop(pq) # 2
+heapq.heappop(pq) # 3
+
+
+PriorityQueue
+from queue import PriorityQueue
+
+pq = PriorityQueue()
+
+pq.put(1)
+pq.put(3)
+pq.put(2)
+
+pq.get() # 1
+pq.get() # 2
+pq.get() # 3
+
+
+다음과 같은 의문이 들 수 있습니다.
+똑같은 역할을 하는데 과연 두 라이브러리들은 무엇이 다를까?
+
+PriorityQueue는 객체이고 heapq는 여러 함수들이 들어있는 파일입니다.
+맞는 말이긴 합니다.
+
+정확하게 말하면 PriorityQueue은 lock을 제공하여 thread-safty class입니다.
+반면에 heapq는 list를 사용하기 때문에 thread-safty class가 아닙니다.
+
+그래서 그런지 몰라도 실행시킬 때 실행속도가 차이가 납니다. (제 추측…)
+
+실행속도 비교
+t2.micro에서 실험을 진행했습니다.
+
+Duration of PriorityQueue 0.980911
+Duration of heapq         0.175374
+
+
+코드
+from queue import PriorityQueue
+import heapq
+import random
+from time import time
+
+nums = [random.random() for _ in range(100000)]
+
+priority_queue = PriorityQueue()
+pq = []
+
+start = time()
+for i in range(len(nums)):
+    priority_queue.put(nums[i])
+
+for i in range(len(nums)):
+    priority_queue.get()
+end = time()
+print(f'Duration of PriorityQueue {end - start:.6f}')
+
+
+start = time()
+for i in range(len(nums)):
+    heapq.heappush(pq, nums[i])
+
+for i in range(len(nums)):
+    heapq.heappop(pq)
+end = time()
+print(f'Duration of heapq         {end - start:.6f}')
+
+
+마치며
+사실 이 라이브러리는 백준 보석도둑을 풀면서 알게되었습니다.
+알고리즘문제를 풀때 heapq를 써야지 PriorityQueue를 쓰면 시간초과가 결렸습니다.
+다들 저와 같은 실수를 하지 않길 빌면서 이만 가보도록 하겠습니다.
+알고리즘 어렵다!
+" />
+
+<meta name="author" content="Playground of Wonbeomjang" />
+
+
+<meta property="og:title" content="[Python] 우선순위 큐 (heapq vs priority queue)" />
+<meta property="twitter:title" content="[Python] 우선순위 큐 (heapq vs priority queue)" />
+
+<title>[Python] 우선순위 큐 (heapq vs priority queue) – Playground of Wonbeomjang – undergraduated conputer vision researcher</title>
+
+    <link rel="stylesheet" type="text/css" href="/style.css"/>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/ress/dist/ress.min.css"/>
+    <link rel="apple-touch-icon" sizes="57x57" href="/assets/image/favicon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/assets/image/favicon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/image/favicon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/assets/image/favicon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/assets/image/favicon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/assets/image/favicon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/assets/image/favicon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/assets/image/favicon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/image/favicon-180x180.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/image/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/image/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/assets/image/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/image/favicon-192x192.png">
+    <link rel="shortcut icon" type="image/x-icon" href="/assets/image/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/assets/image/favicon.ico">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/assets/image/favicon-144x144.png">
+    <meta name="msapplication-config" content="/assets/image/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="alternate" type="application/rss+xml" title="Playground of Wonbeomjang - undergraduated conputer vision researcher" href="/feed.xml"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css" integrity="sha256-XoaMnoYC5TH6/+ihMEnospgm0J1PM/nioxbOUdnM8HY=" crossorigin="anonymous" media="print" onload="this.media='all'"/>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.6.5/plyr.css" media="print" onload="this.media='all'"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" media="print" onload="this.media='all'"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.css" integrity="sha384-zTROYFVGOfTw7JV7KUu8udsvW2fx4lWOsCEDqhBreBwlHI4ioVRtmIvEThzJHGET" crossorigin="anonymous" media="print" onload="this.media='all'"/>
+
+  </head>
+
+  <body>
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="/" class="site-avatar"><img src="https://avatars.githubusercontent.com/u/40621030?v=4" width="70" height="70" /></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="/">Playground of Wonbeomjang</a></h1>
+            <p class="site-description">undergraduated conputer vision researcher</p>
+          </div>
+
+          <nav class="nav-menu">
+            
+  <a class="nav-menu-item" href="/">Blog</a>
+
+  <a class="nav-menu-item" href="/about">About</a>
+
+  <a class="nav-menu-item" href="/categories">Categories</a>
+
+  <a class="nav-menu-item" href="https://github.com/wonbeomjang">GitHub</a>
+
+
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>[Python] 우선순위 큐 (heapq vs priority queue)</h1>
+
+  <div class="entry">
+    <p>파이썬에서는 유용한 자료구조 라이브러리를 제공합니다. 
+그 중에 하나는 우선순위 큐(priority queue)입니다.</p>
+
+<h2 id="우선순위-큐란">우선순위 큐란?</h2>
+<p>우리는 많은 경우에서 우선순위를 만납니다.
+응급실의 예를 들어보겠습니다.
+다음의 환자들이 있습니다. 
+스케쥴링을 이야기할 것이 아니기 때문에 치료 시간은 0으로 가정하겠습니다.</p>
+
+<ol>
+  <li>5분 이내 치료해야할 사람</li>
+  <li>10분 이내 치료해야할 사람</li>
+  <li>2분 이내 치료해야할 사람</li>
+</ol>
+
+<p>우리는 위의 환자의 치료 순위를 어떻게 정해야합니까?
+3 -&gt; 1 -&gt; 2순으로 치료해야 할 것입니다. 
+위의 상황을 해결해주는 자료구조가 우선순위 큐입니다.</p>
+
+<p>구현 방법은 이 글에서 다루지 않겠습니다.</p>
+
+<h2 id="파이썬-라이브러리">파이썬 라이브러리</h2>
+<p>파이썬에서는 heapq, PriorityQueue로 우선순위 큐를 지원합니다.
+사용법은 다음과 같습니다.</p>
+
+<h3 id="heapq">heapq</h3>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">heapq</span>
+
+<span class="n">pq</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">heapq</span><span class="p">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">pq</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">heapq</span><span class="p">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">pq</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">heapq</span><span class="p">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">pq</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">heapq</span><span class="p">.</span><span class="n">heappop</span><span class="p">(</span><span class="n">pq</span><span class="p">)</span> <span class="c1"># 1
+</span><span class="n">heapq</span><span class="p">.</span><span class="n">heappop</span><span class="p">(</span><span class="n">pq</span><span class="p">)</span> <span class="c1"># 2
+</span><span class="n">heapq</span><span class="p">.</span><span class="n">heappop</span><span class="p">(</span><span class="n">pq</span><span class="p">)</span> <span class="c1"># 3
+</span></code></pre></div></div>
+
+<h3 id="priorityqueue">PriorityQueue</h3>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">queue</span> <span class="kn">import</span> <span class="n">PriorityQueue</span>
+
+<span class="n">pq</span> <span class="o">=</span> <span class="n">PriorityQueue</span><span class="p">()</span>
+
+<span class="n">pq</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">pq</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">pq</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">pq</span><span class="p">.</span><span class="n">get</span><span class="p">()</span> <span class="c1"># 1
+</span><span class="n">pq</span><span class="p">.</span><span class="n">get</span><span class="p">()</span> <span class="c1"># 2
+</span><span class="n">pq</span><span class="p">.</span><span class="n">get</span><span class="p">()</span> <span class="c1"># 3
+</span></code></pre></div></div>
+
+<p>다음과 같은 의문이 들 수 있습니다.
+<em>똑같은 역할을 하는데 과연 두 라이브러리들은 무엇이 다를까?</em></p>
+
+<p><del>PriorityQueue는 객체이고 heapq는 여러 함수들이 들어있는 파일입니다.</del>
+맞는 말이긴 합니다.</p>
+
+<p>정확하게 말하면 PriorityQueue은 lock을 제공하여 thread-safty class입니다.
+반면에 heapq는 list를 사용하기 때문에 thread-safty class가 아닙니다.</p>
+
+<p>그래서 그런지 몰라도 실행시킬 때 실행속도가 차이가 납니다. (제 추측…)</p>
+
+<h2 id="실행속도-비교">실행속도 비교</h2>
+<p>t2.micro에서 실험을 진행했습니다.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Duration of PriorityQueue 0.980911
+Duration of heapq         0.175374
+</code></pre></div></div>
+
+<p>코드</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">queue</span> <span class="kn">import</span> <span class="n">PriorityQueue</span>
+<span class="kn">import</span> <span class="nn">heapq</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+
+<span class="n">nums</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="p">.</span><span class="n">random</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">)]</span>
+
+<span class="n">priority_queue</span> <span class="o">=</span> <span class="n">PriorityQueue</span><span class="p">()</span>
+<span class="n">pq</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nums</span><span class="p">)):</span>
+    <span class="n">priority_queue</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nums</span><span class="p">)):</span>
+    <span class="n">priority_queue</span><span class="p">.</span><span class="n">get</span><span class="p">()</span>
+<span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'Duration of PriorityQueue </span><span class="si">{</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">:.</span><span class="mi">6</span><span class="n">f</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+
+
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nums</span><span class="p">)):</span>
+    <span class="n">heapq</span><span class="p">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">pq</span><span class="p">,</span> <span class="n">nums</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nums</span><span class="p">)):</span>
+    <span class="n">heapq</span><span class="p">.</span><span class="n">heappop</span><span class="p">(</span><span class="n">pq</span><span class="p">)</span>
+<span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'Duration of heapq         </span><span class="si">{</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">:.</span><span class="mi">6</span><span class="n">f</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="마치며">마치며</h2>
+<p>사실 이 라이브러리는 백준 <a href="https://www.acmicpc.net/problem/1202">보석도둑</a>을 풀면서 알게되었습니다.
+알고리즘문제를 풀때 heapq를 써야지 PriorityQueue를 쓰면 시간초과가 결렸습니다.<br />
+다들 저와 같은 실수를 하지 않길 빌면서 이만 가보도록 하겠습니다.
+<del>알고리즘 어렵다!</del></p>
+
+  </div>
+
+  <div class="date">
+    <i class="fa fa-calendar fa-fw" aria-hidden="true"></i>&nbsp;Date:<span style="color: #333333; font-weight: normal;">&nbsp;January 10, 2021</span>
+  </div>
+
+  <div class="post-categories">
+    <i class="fa fa-tags fa-fw" aria-hidden="true"></i>&nbsp;Tags:&nbsp;
+      
+      
+      <a class="categories-button"<a href="/categories/#Data Structure">Data Structure</a>
+      
+      
+      <a class="categories-button"<a href="/categories/#Python">Python</a>
+      
+      
+  </div>
+
+  <div class="share-post">
+    <i class="fa fa-share-alt-square fa-fw" aria-hidden="true"></i>&nbsp;Share:&nbsp;
+    <!-- Sharingbutton Facebook -->
+<a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/" title="Share on Facebook" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton Twitter -->
+<a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?text=[Python] 우선순위 큐 (heapq vs priority queue)&amp;url=http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/" title="Share on Twitter" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--twitter resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M23.44 4.83c-.8.37-1.5.38-2.22.02.93-.56.98-.96 1.32-2.02-.88.52-1.86.9-2.9 1.1-.82-.88-2-1.43-3.3-1.43-2.5 0-4.55 2.04-4.55 4.54 0 .36.03.7.1 1.04-3.77-.2-7.12-2-9.36-4.75-.4.67-.6 1.45-.6 2.3 0 1.56.8 2.95 2 3.77-.74-.03-1.44-.23-2.05-.57v.06c0 2.2 1.56 4.03 3.64 4.44-.67.2-1.37.2-2.06.08.58 1.8 2.26 3.12 4.25 3.16C5.78 18.1 3.37 18.74 1 18.46c2 1.3 4.4 2.04 6.97 2.04 8.35 0 12.92-6.92 12.92-12.93 0-.2 0-.4-.02-.6.9-.63 1.96-1.22 2.56-2.14z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton Tumblr -->
+<a class="resp-sharing-button__link" href="https://www.tumblr.com/widgets/share/tool?posttype=link&amp;title=[Python] 우선순위 큐 (heapq vs priority queue)&amp;content=http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/&amp;canonicalUrl=http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/&amp;shareSource=tumblr_share_button" title="Share on Tumblr" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--tumblr resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.5.5v5h5v4h-5V15c0 5 3.5 4.4 6 2.8v4.4c-6.7 3.2-12 0-12-4.2V9.5h-3V6.7c1-.3 2.2-.7 3-1.3.5-.5 1-1.2 1.4-2 .3-.7.6-1.7.7-3h3.8z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton E-Mail -->
+<a class="resp-sharing-button__link" href="mailto:?subject=[Python] 우선순위 큐 (heapq vs priority queue)&body=You can read more at this site%2C%0Ahttp://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/" title="Share via E-Mail" target="_self" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--email resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 4H2C.9 4 0 4.9 0 6v12c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM7.25 14.43l-3.5 2c-.08.05-.17.07-.25.07-.17 0-.34-.1-.43-.25-.14-.24-.06-.55.18-.68l3.5-2c.24-.14.55-.06.68.18.14.24.06.55-.18.68zm4.75.07c-.1 0-.2-.03-.27-.08l-8.5-5.5c-.23-.15-.3-.46-.15-.7.15-.22.46-.3.7-.14L12 13.4l8.23-5.32c.23-.15.54-.08.7.15.14.23.07.54-.16.7l-8.5 5.5c-.08.04-.17.07-.27.07zm8.93 1.75c-.1.16-.26.25-.43.25-.08 0-.17-.02-.25-.07l-3.5-2c-.24-.13-.32-.44-.18-.68s.44-.32.68-.18l3.5 2c.24.13.32.44.18.68z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton Pinterest -->
+<a class="resp-sharing-button__link" href="https://pinterest.com/pin/create/button/?url=http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/&amp;media=http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/&amp;description=[Python] 우선순위 큐 (heapq vs priority queue)" title="Share on Pinterest" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--pinterest resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12.14.5C5.86.5 2.7 5 2.7 8.75c0 2.27.86 4.3 2.7 5.05.3.12.57 0 .66-.33l.27-1.06c.1-.32.06-.44-.2-.73-.52-.62-.86-1.44-.86-2.6 0-3.33 2.5-6.32 6.5-6.32 3.55 0 5.5 2.17 5.5 5.07 0 3.8-1.7 7.02-4.2 7.02-1.37 0-2.4-1.14-2.07-2.54.4-1.68 1.16-3.48 1.16-4.7 0-1.07-.58-1.98-1.78-1.98-1.4 0-2.55 1.47-2.55 3.42 0 1.25.43 2.1.43 2.1l-1.7 7.2c-.5 2.13-.08 4.75-.04 5 .02.17.22.2.3.1.14-.18 1.82-2.26 2.4-4.33.16-.58.93-3.63.93-3.63.45.88 1.8 1.65 3.22 1.65 4.25 0 7.13-3.87 7.13-9.05C20.5 4.15 17.18.5 12.14.5z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton LinkedIn -->
+<a class="resp-sharing-button__link" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/&amp;title=[Python] 우선순위 큐 (heapq vs priority queue)&amp;summary=[Python] 우선순위 큐 (heapq vs priority queue)&amp;source=http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/" title="Share on LinkedIn" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--linkedin resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6.5 21.5h-5v-13h5v13zM4 6.5C2.5 6.5 1.5 5.3 1.5 4s1-2.4 2.5-2.4c1.6 0 2.5 1 2.6 2.5 0 1.4-1 2.5-2.6 2.5zm11.5 6c-1 0-2 1-2 2v7h-5v-13h5V10s1.6-1.5 4-1.5c3 0 5 2.2 5 6.3v6.7h-5v-7c0-1-1-2-2-2z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton Reddit -->
+<a class="resp-sharing-button__link" href="https://reddit.com/submit/?url=http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/&amp;resubmit=true&amp;title=[Python] 우선순위 큐 (heapq vs priority queue)" title="Share on Reddit" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--reddit resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M24 11.5c0-1.65-1.35-3-3-3-.96 0-1.86.48-2.42 1.24-1.64-1-3.75-1.64-6.07-1.72.08-1.1.4-3.05 1.52-3.7.72-.4 1.73-.24 3 .5C17.2 6.3 18.46 7.5 20 7.5c1.65 0 3-1.35 3-3s-1.35-3-3-3c-1.38 0-2.54.94-2.88 2.22-1.43-.72-2.64-.8-3.6-.25-1.64.94-1.95 3.47-2 4.55-2.33.08-4.45.7-6.1 1.72C4.86 8.98 3.96 8.5 3 8.5c-1.65 0-3 1.35-3 3 0 1.32.84 2.44 2.05 2.84-.03.22-.05.44-.05.66 0 3.86 4.5 7 10 7s10-3.14 10-7c0-.22-.02-.44-.05-.66 1.2-.4 2.05-1.54 2.05-2.84zM2.3 13.37C1.5 13.07 1 12.35 1 11.5c0-1.1.9-2 2-2 .64 0 1.22.32 1.6.82-1.1.85-1.92 1.9-2.3 3.05zm3.7.13c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm9.8 4.8c-1.08.63-2.42.96-3.8.96-1.4 0-2.74-.34-3.8-.95-.24-.13-.32-.44-.2-.68.15-.24.46-.32.7-.18 1.83 1.06 4.76 1.06 6.6 0 .23-.13.53-.05.67.2.14.23.06.54-.18.67zm.2-2.8c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm5.7-2.13c-.38-1.16-1.2-2.2-2.3-3.05.38-.5.97-.82 1.6-.82 1.1 0 2 .9 2 2 0 .84-.53 1.57-1.3 1.87z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton XING -->
+<a class="resp-sharing-button__link" href="https://www.xing.com/app/user?op=share;http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/;title=[Python] 우선순위 큐 (heapq vs priority queue)" title="Share on XING" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--xing resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10.2 9.7l-3-5.4C7.2 4 7 4 6.8 4h-5c-.3 0-.4 0-.5.2v.5L4 10 .4 16v.5c0 .2.2.3.4.3h5c.3 0 .4 0 .5-.2l4-6.6v-.5zM24 .2l-.5-.2H18s-.2 0-.3.3l-8 14v.4l5.2 9c0 .2 0 .3.3.3h5.4s.3 0 .4-.2c.2-.2.2-.4 0-.5l-5-8.8L24 .7V.2z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton WhatsApp -->
+<a class="resp-sharing-button__link" href="whatsapp://send?text=[Python] 우선순위 큐 (heapq vs priority queue)%20http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/" title="Share via WhatsApp" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--whatsapp resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.1 3.9C17.9 1.7 15 .5 12 .5 5.8.5.7 5.6.7 11.9c0 2 .5 3.9 1.5 5.6L.6 23.4l6-1.6c1.6.9 3.5 1.3 5.4 1.3 6.3 0 11.4-5.1 11.4-11.4-.1-2.8-1.2-5.7-3.3-7.8zM12 21.4c-1.7 0-3.3-.5-4.8-1.3l-.4-.2-3.5 1 1-3.4L4 17c-1-1.5-1.4-3.2-1.4-5.1 0-5.2 4.2-9.4 9.4-9.4 2.5 0 4.9 1 6.7 2.8 1.8 1.8 2.8 4.2 2.8 6.7-.1 5.2-4.3 9.4-9.5 9.4zm5.1-7.1c-.3-.1-1.7-.9-1.9-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.1-.2.2-.3.2-.6.1s-1.2-.5-2.3-1.4c-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6s.3-.3.4-.5c.2-.1.3-.3.4-.5.1-.2 0-.4 0-.5C10 9 9.3 7.6 9 7c-.1-.4-.4-.3-.5-.3h-.6s-.4.1-.7.3c-.3.3-1 1-1 2.4s1 2.8 1.1 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.3-.3-.4-.6-.5z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton Hacker News -->
+<a class="resp-sharing-button__link" href="https://news.ycombinator.com/submitlink?u=http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/&amp;t=[Python] 우선순위 큐 (heapq vs priority queue)" title="Share on Hacker News" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--hackernews resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><path fill-rule="evenodd" d="M60.94 82.314L17 0h20.08l25.85 52.093c.397.927.86 1.888 1.39 2.883.53.994.995 2.02 1.393 3.08.265.4.463.764.596 1.095.13.334.262.63.395.898.662 1.325 1.26 2.618 1.79 3.877.53 1.26.993 2.42 1.39 3.48 1.06-2.254 2.22-4.673 3.48-7.258 1.26-2.585 2.552-5.27 3.877-8.052L103.49 0h18.69L77.84 83.308v53.087h-16.9v-54.08z"></path></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton VK -->
+<a class="resp-sharing-button__link" href="http://vk.com/share.php?title=[Python] 우선순위 큐 (heapq vs priority queue)&amp;url=http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/" title="Share on VK" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--vk resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.547 7h-3.29a.743.743 0 0 0-.655.392s-1.312 2.416-1.734 3.23C14.734 12.813 14 12.126 14 11.11V7.603A1.104 1.104 0 0 0 12.896 6.5h-2.474a1.982 1.982 0 0 0-1.75.813s1.255-.204 1.255 1.49c0 .42.022 1.626.04 2.64a.73.73 0 0 1-1.272.503 21.54 21.54 0 0 1-2.498-4.543.693.693 0 0 0-.63-.403h-2.99a.508.508 0 0 0-.48.685C3.005 10.175 6.918 18 11.38 18h1.878a.742.742 0 0 0 .742-.742v-1.135a.73.73 0 0 1 1.23-.53l2.247 2.112a1.09 1.09 0 0 0 .746.295h2.953c1.424 0 1.424-.988.647-1.753-.546-.538-2.518-2.617-2.518-2.617a1.02 1.02 0 0 1-.078-1.323c.637-.84 1.68-2.212 2.122-2.8.603-.804 1.697-2.507.197-2.507z"/></svg>
+    </div>
+  </div>
+</a>
+
+<!-- Sharingbutton Telegram -->
+<a class="resp-sharing-button__link" href="https://telegram.me/share/url?text=[Python] 우선순위 큐 (heapq vs priority queue)&amp;url=http://localhost:4000/data%20structure/python/2021/01/10/heapq-vs-priority-q/" title="Share via Telegram" target="_blank" rel="noopener" aria-label="">
+  <div class="resp-sharing-button resp-sharing-button--telegram resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M.707 8.475C.275 8.64 0 9.508 0 9.508s.284.867.718 1.03l5.09 1.897 1.986 6.38a1.102 1.102 0 0 0 1.75.527l2.96-2.41a.405.405 0 0 1 .494-.013l5.34 3.87a1.1 1.1 0 0 0 1.046.135 1.1 1.1 0 0 0 .682-.803l3.91-18.795A1.102 1.102 0 0 0 22.5.075L.706 8.475z"/></svg>
+    </div>
+  </div>
+</a>
+
+  </div>
+
+  <div class="related-posts">
+    <div class="related-posts">
+<span class="related-posts-heading">Related Posts:</span><br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+
+  
+
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+
+
+
+
+  
+    
+    
+    
+
+    
+    <div class="related-posts-post">
+  <a href="/computer%20vision/knowledge%20distillation/2022/05/09/fitnet/">
+    FitNet
+  </a>
+</div>
+
+
+  
+    
+    
+    
+
+    
+    <div class="related-posts-post">
+  <a href="/osam/2021/11/11/osam-3/">
+    [OSAM] 3. 이제 끝나는 건가?
+  </a>
+</div>
+
+
+  
+    
+    
+    
+
+    
+    <div class="related-posts-post">
+  <a href="/osam/computer%20vision/2021/10/29/osam-2/">
+    [OSAM] 2. computer vision 개발 과정
+  </a>
+</div>
+
+
+  
+    
+    
+    
+      
+
+
+</div>
+
+  </div>
+
+  <div class="post-nav">
+    <div class="post-nav">
+  <p>
+    
+    <span class="post-nav-label">Previous</span><br>
+    <a href="/computer%20vision/2021/01/10/SENet/">&#9194;&nbsp;학부생이 본 SENet</a>
+    
+  </p>
+  <p>
+    
+    <span class="post-nav-label">Next</span><br>
+    <a href="/computer%20vision/neural%20architecture%20search/2021/01/27/NASNet/">[AutoML] NASNet&nbsp;&#9193;</a>
+    
+  </p>
+</div>
+
+  </div>
+
+</article>
+
+    </div>
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer"><div class="copyright">
+            
+            <p>&copy; 2022 Playground of Wonbeomjang. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/forever-jekyll/forever-jekyll" rel="nofollow">Forever Jekyll</a>.</p>
+            
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <script defer src="https://cdn.plyr.io/3.6.5/plyr.js"></script>
+    <script>
+      const player = new Plyr("#player", { noCookie: true, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1, playsinline: 1 , enablejsapi: 1, autoplay: 0, focused: true, global: false });
+      window.player = player;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
+    <script type="text/javascript">
+      const lightbox = GLightbox({
+          touchNavigation: true,
+          loop: true,
+          autoplayVideos: true
+      });
+    </script>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.js" integrity="sha384-GxNFqL3r9uRJQhR+47eDxuPoNE7yLftQM8LcxzgS4HT73tp970WS/wV5p8UzCOmb" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@latest/dist/contrib/auto-render.min.js"
+            onload="renderMathInElement(document.body,{
+                    delimiters: [
+                    { left: '$$',  right: '$$',  display: true  },
+                    { left: '$',   right: '$',   display: false },
+                    { left: '\\[', right: '\\]', display: true  },
+                    { left: '\\(', right: '\\)', display: false }
+                    ]});">
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+    <script>
+      function addDarkmodeWidget() {
+        new Darkmode().showWidget();
+        window.addEventListener('load', addDarkmodeWidget);
+      }
+      const options = {
+        label: '🌓',
+      }
+      const darkmode = new Darkmode(options);
+            darkmode.showWidget();
+    </script>
+  <script data-goatcounter="https://jtiger958.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+  </body>
+</html>
