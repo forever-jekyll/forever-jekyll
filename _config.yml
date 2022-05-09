@@ -112,3 +112,5 @@ exclude:
   - LICENSE
   - README.md
   - CNAME
+
+google_analytics: UA-148043102-1

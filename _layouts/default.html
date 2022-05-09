@@ -2,7 +2,10 @@
 <html lang="{{ site.lang | default: "en" }}">
   <head>
     {% include meta.html %}
-
+    {%- if jekyll.environment == 'production' and site.google_analytics -%}
+      {%- include google-analytics.html -%}
+    {%- endif -%}
+    
     <title>{% if page.title %}{{ page.title }} – {% endif %}{{ site.title }} – {{ site.description }}</title>
 
     <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css"/>
