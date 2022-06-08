@@ -55,11 +55,11 @@ footer_links:
     
   - title: Hack The Box
     url: https://app.hackthebox.eu/profile/531933
-    icon: svg-icon hackthebox
+    icon: fa svg-icon hackthebox
     
   - title: TryHackMe
     url: https://tryhackme.com/p/0x02B375
-    icon: svg-icon tryhackme
+    icon: fa svg-icon tryhackme
 
 # Enter your copyright text if you wish to override the default one.
 #copyright: "This site is made with <3 by *me, myself, and I*."
