@@ -43,23 +43,23 @@ navigation_links:
 footer_links:
   - title: Feed
     url: feed.xml
-    icon: fa fa-rss-square
+    icon: fa fa-rss-square fa-2x
 
   - title: Twitter
     url: https://twitter.com/0x68306767
-    icon: fa fa-twitter-square
+    icon: fa fa-twitter-square fa-2x
 
   - title: GitHub
     url: https://github.com/gg0h
-    icon: fa fa-github-square
+    icon: fa fa-github-square fa-2x
     
   - title: Hack The Box
     url: https://app.hackthebox.eu/profile/531933
-    icon: fa svg-icon hackthebox
+    icon: svg-icon hackthebox
     
   - title: TryHackMe
     url: https://tryhackme.com/p/0x02B375
-    icon: fa svg-icon tryhackme
+    icon: svg-icon tryhackme
 
 # Enter your copyright text if you wish to override the default one.
 #copyright: "This site is made with <3 by *me, myself, and I*."
