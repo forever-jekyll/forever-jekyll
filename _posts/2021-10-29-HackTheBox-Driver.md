@@ -5,8 +5,9 @@ title: Hack The Box - Driver
 
 I have spent much of the past few months preparing for OSCP, so I haven't posted one of these in a while, I thought it was about time to change that. Here is my walkthrough of the "Driver" box on [HackTheBox](https://www.hackthebox.eu)
 
----
 [![](/assets/image/attachments/Pasted&#32;image&#32;20211029172229.png)](/assets/image/attachments/Pasted&#32;image&#32;20211029172229.png){:.glightbox}
+
+---
 
 
 ## Port scan
