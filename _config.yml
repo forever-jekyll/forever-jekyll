@@ -53,13 +53,13 @@ footer_links:
     url: https://github.com/gg0h
     icon: fa fa-github-square fa-2x
     
-  - title: Hack The Box
-    url: https://app.hackthebox.eu/profile/531933
-    icon: svg-icon hackthebox
+#   - title: Hack The Box
+#     url: https://app.hackthebox.eu/profile/531933
+#     icon: svg-icon hackthebox
     
-  - title: TryHackMe
-    url: https://tryhackme.com/p/0x02B375
-    icon: svg-icon tryhackme
+#   - title: TryHackMe
+#     url: https://tryhackme.com/p/0x02B375
+#     icon: svg-icon tryhackme
 
 # Enter your copyright text if you wish to override the default one.
 #copyright: "This site is made with <3 by *me, myself, and I*."
