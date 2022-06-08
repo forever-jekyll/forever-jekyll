@@ -1,4 +1,5 @@
 {
   "readableLineLength": false,
-  "attachmentFolderPath": "assets/image/attachments"
+  "attachmentFolderPath": "assets/image/attachments",
+  "useMarkdownLinks": true
 }

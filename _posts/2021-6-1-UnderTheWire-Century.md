@@ -7,7 +7,7 @@ This post is an overview of my time working through the wargame "century" found 
 
 ---
 
-![](/assets/image/attachments/utw-bg.png)
+[![](/assets/image/attachments/utw-bg.png)](/assets/image/attachments/utw-bg.png){:.glightbox}
 
 My PowerShell skills are... _lacking_. I very often need to look up How to do X, how to do Y,
 you get the idea. So I've decided to change that by working through UnderTheWire wargames, an 

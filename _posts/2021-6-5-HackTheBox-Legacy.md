@@ -6,7 +6,7 @@ title: Hack The Box - Legacy
 This post is an overview of my time working through the box "Legacy" found in [HackTheBox](https://www.hackthebox.eu)
 
 ---
-![](/assets/image/attachments/Pasted&#32;image&#32;20210707143217.png)
+[![](/assets/image/attachments/Pasted&#32;image&#32;20210707143217.png)](/assets/image/attachments/Pasted&#32;image&#32;20210707143217.png){:.glightbox}
 
 As part of the PEH course offered by Heath Adams (thecybermentor) I am completing a series of Hack the Box machines, the first of these is Legacy.
 
@@ -131,56 +131,9 @@ Could not initialise srvsvc. Error was NT_STATUS_ACCESS_DENIED
  ======================================= 
 [E] Can't list shares: NT_STATUS_ACCESS_DENIED
 
-[+] Attempting to map shares on 10.10.10.4
+# nothing else of note
 
- ================================================== 
-|    Password Policy Information for 10.10.10.4    |
- ================================================== 
-[E] Unexpected error from polenum:
-
-
-[+] Attaching to 10.10.10.4 using a NULL share
-
-[+] Trying protocol 139/SMB...
-
-	[!] Protocol failed: Cannot request session (Called Name:10.10.10.4)
-
-[+] Trying protocol 445/SMB...
-
-	[!] Protocol failed: SMB SessionError: STATUS_ACCESS_DENIED({Access Denied} A process has requested access to an object but has not been granted those access rights.)
-
-
-[E] Failed to get password policy with rpcclient
-
-
- ============================ 
-|    Groups on 10.10.10.4    |
- ============================ 
-
-[+] Getting builtin groups:
-
-[+] Getting builtin group memberships:
-
-[+] Getting local groups:
-
-[+] Getting local group memberships:
-
-[+] Getting domain groups:
-
-[+] Getting domain group memberships:
-
- ===================================================================== 
-|    Users on 10.10.10.4 via RID cycling (RIDS: 500-550,1000-1050)    |
- ===================================================================== 
-[E] Couldn't get SID: NT_STATUS_ACCESS_DENIED.  RID cycling not possible.
-
- =========================================== 
-|    Getting printer info for 10.10.10.4    |
- =========================================== 
-No printers returned.
-
-
-enum4linux complete on Sat Jun  5 10:05:48 2021
+... SNIP  
 
 
 ```
@@ -481,7 +434,8 @@ shellcode+= "\x3e"
 
 running the script
 
-![](/assets/image/attachments/Pasted&#32;image&#32;20210605162843.png)
+[![](/assets/image/attachments/Pasted&#32;image&#32;20210605162843.png)](/assets/image/attachments/Pasted&#32;image&#32;20210605162843.png){:.glightbox}
+
 
 we get back a reverse shell
 
