@@ -6,7 +6,7 @@ title: Hack The Box - Driver
 I have spent much of the past few months preparing for OSCP, so I haven't posted one of these in a while, I thought it was about time to change that. Here is my walkthrough of the "Driver" box on [HackTheBox](https://www.hackthebox.eu)
 
 ---
-![](/assets/image/attachmentsPasted&#32;image&#32;20211029172229.png)
+[![](/assets/image/attachments/Pasted&#32;image&#32;20211029172229.png)](/assets/image/attachments/Pasted&#32;image&#32;20211029172229.png){:.glightbox}
 
 
 ## Port scan
@@ -120,7 +120,7 @@ Error: Exiting with code 1
 ## HTTP port 80 enumeration
 upon navigating to http://10.10.11.106/ in a web browser we are prompted for a login
 
-![](/assets/image/attachmentsPasted&#32;image&#32;20211029135840.png)
+![](/assets/image/attachments/Pasted&#32;image&#32;20211029135840.png)
 
 trying a few defaults such as:
 ```
@@ -137,7 +137,7 @@ we find an email address on the home page `support@driver.htb`
 
 by trying to navigate to `http://10.10.11.106/index.php` we are redirected to the home page confirming this is a php webapp
 
-![](/assets/image/attachmentsPasted&#32;image&#32;20211029140427.png)
+![](/assets/image/attachments/Pasted&#32;image&#32;20211029140427.png)
 
 Using the Firmware Updates tab we can upload a firmware configuration file for a specified printer model. It seems possible that we might be able to upload a reverse shell via this method.
 
@@ -194,7 +194,7 @@ responder -wrf --lm -v -I tun0
 
 now uploading the file we get hashes captured on responder
 
-![](/assets/image/attachmentsPasted&#32;image&#32;20211029152004.png)
+![](/assets/image/attachments/Pasted&#32;image&#32;20211029152004.png)
 
 the hashes appear different each time although it is the same user, I am slightly confused about this but I hypothesise it is some randomization invovled in the NetNTLM scheme.
 
