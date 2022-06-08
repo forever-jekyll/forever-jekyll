@@ -8,11 +8,12 @@ Hello, I am Matthew a Computer Science student from Northern Ireland. I blog abo
 
 #### HackTheBox
 
-![hackthebox](https://tryhackme-badges.s3.amazonaws.com/0x02B375.png)
+![tryhackme](https://www.hackthebox.eu/badge/image/531933)
+
 
 #### TryHackMe 
 
-![tryhackme](https://www.hackthebox.eu/badge/image/531933)
+![hackthebox](https://tryhackme-badges.s3.amazonaws.com/0x02B375.png)
 
 ### Contact me
 
