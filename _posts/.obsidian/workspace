@@ -1,0 +1,97 @@
+{
+  "main": {
+    "id": "0a91155e1a7a4035",
+    "type": "split",
+    "children": [
+      {
+        "id": "2e1687d6b0917e4a",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "2021-10-29-HackTheBox-Driver.md",
+            "mode": "source"
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "76e4dbdc7969181f",
+    "type": "split",
+    "children": [
+      {
+        "id": "0f1f40b458c76882",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "59257fd5a142955b",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "1c3ab28a0718080c",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "848ec71a17a213ba",
+    "type": "split",
+    "children": [
+      {
+        "id": "5b33c346f35c96c1",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e3cf7377ad15b6ca",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "2021-10-29-HackTheBox-Driver.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "2e1687d6b0917e4a",
+  "lastOpenFiles": [
+    "2021-10-29-HackTheBox-Driver.md",
+    "2021-7-7-HackTheBox-Active.md",
+    "2021-6-8-HackTheBox-Devel.md",
+    "2021-6-5-HackTheBox-Legacy.md",
+    "2021-6-1-UnderTheWire-Century.md"
+  ]
+}
