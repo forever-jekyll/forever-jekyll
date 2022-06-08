@@ -1,9 +1,13 @@
 ---
 layout: page
-title: About
-permalink: /about
+title: $whoami
+permalink: /about/
 ---
 
-Hi, Write an awesome description about your blog here.  
-Feel free to make it a bit more interesting by adding a picture or two.  
-Only limit here is your creativity and imagination. Unleash them with full force.  
+Hello, I am Matthew a Computer Science student from Northern Ireland. I blog about web development, capture the flag challenges, TryHackMe/HackTheBox rooms and other security related topics that I find interesting
+
+
+
+### Contact me
+
+[gg0h.ctf@gmail.com](mailto:gg0h.ctf@gmail.com)
