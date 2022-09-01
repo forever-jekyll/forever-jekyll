@@ -4,6 +4,6 @@ title: About
 permalink: /about
 ---
 
-Hi, Write an awesome description about your blog here.  
-Feel free to make it a bit more interesting by adding a picture or two.  
-Only limit here is your creativity and imagination. Unleash them with full force.  
+Hello there friend, welcome to my little slice on the internet.
+
+This is a documentation of my life's mission, to become a Renaissance Woman. It started out as something I named "The Polymath Map" that detailed my desire to learn and master different things like Technology, Art, Music, Language, Sports and other things Miscellaneous that do not fit the previous categories. It is my hope that I will continue to document this until I check out from life. 
