@@ -6,7 +6,7 @@ title: Hack The Box - Seventeen
 Today I decided to tackle the latest hard release "Seventeen" from [HackTheBox](https://www.hackthebox.eu)
 
 ---
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220530000215.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220530000215.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220530000215.png)](/assets/image/attachments/Pasted&#32;image&#32;20220530000215.png){:.glightbox}
 
 ## Summary
 Seventeen's user is about detailed enumeration. There is a lot of things to look at, that might lead you astray (as it did with me). We find a file management service with an upload functionality that can be exploited to upload a php reverse shell, but the file upload only works when accessing the application via the correct subdomain. From here we enumerate first in a docker container and then in the host itself to find exposed credentials, which we can reuse to gain access to user accounts on the target.
