@@ -4,7 +4,7 @@ title: Hack The Box - Seventeen
 ---
 
 Today I decided to tackle the latest hard release "Seventeen" from [HackTheBox](https://www.hackthebox.eu)
-
+git 
 ---
 [![](/assets/image/attachments/Pasted&#32;image&#32;20220530000215.png)](/assets/image/attachments/Pasted&#32;image&#32;20220530000215.png){:.glightbox}
 
