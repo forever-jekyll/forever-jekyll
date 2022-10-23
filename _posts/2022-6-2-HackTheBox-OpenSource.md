@@ -5,8 +5,7 @@ title: Hack The Box - Open Source
 
 Open Source is an "easy" box released by [HackTheBox](https://www.hackthebox.eu). I've completed quite a few machines on HackTheBox now and this is one of the hardest easy boxes I've done. Let's see how I did it, with a bonus alternative to the foothold at the end.
 
-
-COMPLETION IMAGE HERE
+[![](/assets/image/attachments/Pasted&#32;image&#32;20221023204021.png)](/assets/image/attachments/Pasted&#32;image&#32;20221023204021.png){:.glightbox}
 
 
 ## Summary
@@ -139,7 +138,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 
 On port 80 there is a file transfer web application, the source code is available for download.
 
-[![](/assets/image/attachments/Pasted&#32;image&#32;20220529145721.png)](/assets/image/attachments/Pasted&#32;image&#32;20220602175603.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220602175603.png)](/assets/image/attachments/Pasted&#32;image&#32;20220602175603.png){:.glightbox}
 
 Additionally there is a live version available at http://10.10.11.164/upcloud
 
@@ -272,17 +271,17 @@ There are credentials used to connect to the proxy. I tried to use these to log 
 
 ### Live version
 On the main page we see a link to the live version
-![](images/attachments/Pasted%20image%2020220602191605.png)
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220602191605.png)](/assets/image/attachments/Pasted&#32;image&#32;20220602191605.png){:.glightbox}
 
 It is a basic file upload application
-![](images/attachments/Pasted%20image%2020220602191421.png)
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220602191421.png)](/assets/image/attachments/Pasted&#32;image&#32;20220602191421.png){:.glightbox}
 
 Simply clicking upload without selecting a file we can trigger an error.
 
-![](images/attachments/Pasted%20image%2020220602191822.png)
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220602191822.png)](/assets/image/attachments/Pasted&#32;image&#32;20220602191822.png){:.glightbox}
 We see debug mode is enabled, so it seems the live version is from the dev branch we found in the repository. So now, we can use the interactive python shell to get a reverse shell right? not so fast, there is a debugging pin enabled
 
-![](images/attachments/Pasted%20image%2020220602192015.png)
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220602192015.png)](/assets/image/attachments/Pasted&#32;image&#32;20220602192015.png){:.glightbox}
 
 At this point I did a deep dive into the how the debug pin for Werkzeug (which flask is using) calculates the debug pin. Some of the articles I looked at are:
 
@@ -359,10 +358,9 @@ I create a test file and write it somewhere publicly readable  to confirm the ar
 echo "test" > test.txt
 ```
 
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220602195921.png)](/assets/image/attachments/Pasted&#32;image&#32;20220602195921.png){:.glightbox}
 
-![](images/attachments/Pasted%20image%2020220602195921.png)
-
-![](images/attachments/Pasted%20image%2020220602195947.png)
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220602195947.png)](/assets/image/attachments/Pasted&#32;image&#32;20220602195947.png){:.glightbox}
 
 We have what we need for RCE now. Debug mode means that files will be automatically reloaded upon being changed. So we may overwrite a template with a malicious version to allow code execution through Jinja2.
 
@@ -561,8 +559,10 @@ The public bits need minimal change, but for the private bits we will need to us
 
 Trying to download `/sys/class/net/eth0/address ` we encounter an error
 
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220602195947.png)](/assets/image/attachments/Pasted&#32;image&#32;20220602195947.png){:.glightbox}
 ![](images/attachments/Pasted%20image%2020220602205458.png)
 and when trying to download the machine id files they are empty
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220602195947.png)](/assets/image/attachments/Pasted&#32;image&#32;20220602195947.png){:.glightbox}
 ![](images/attachments/Pasted%20image%2020220602205620.png)
 
 This is the same for 
@@ -572,8 +572,8 @@ This is the same for
 
 When comparing notes with Opcode, they mentioned using burp repeater rather the browser for the download and sure enough we I try this method I can get the file contents just fine, so what's the problem here?
 
-![](images/attachments/Pasted%20image%2020220602210137.png)
-![](images/attachments/Pasted%20image%2020220602210214.png)
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220602210137.png)](/assets/image/attachments/Pasted&#32;image&#32;20220602210137.png){:.glightbox}
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220602210214.png)](/assets/image/attachments/Pasted&#32;image&#32;20220602210214.png){:.glightbox}
 
 This is when Opcode realised, since we are reading kernelland files they do not behave the same as normal files in some ways. 
 
@@ -582,7 +582,7 @@ This is when Opcode realised, since we are reading kernelland files they do not 
 
 The key one here being the size of the file for many of them is 0 (and for one file we are interested in 4096)
 
-![](images/attachments/Pasted%20image%2020220602210733.png)
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220602210733.png)](/assets/image/attachments/Pasted&#32;image&#32;20220602210733.png){:.glightbox}
 The value was being set as the Content-Length header in the HTTP response, meaning for the `/proc` files the body was ignored and for `/sys/class/net/eth0/address` it lead to an error in what I am guessing is a problem retrieving a file much smaller than the Content-Length indicated.
 
 Now with that out of the way, we can continue with forging the pin. I tried to automate this all with a python script, but I found some parts I had to do manually (because of the content length issue I wasn't able to read response content with python). So I manually download the following files and placed them into the same directory of my script:
@@ -728,6 +728,6 @@ Pin: 574-249-862
 
 We navigate to `http://<IP>/console` and submit our pin, granting access.
 
-![](images/attachments/Pasted%20image%2020220602214059.png)
+[![](/assets/image/attachments/Pasted&#32;image&#32;20220602214059.png)](/assets/image/attachments/Pasted&#32;image&#32;20220602214059.png){:.glightbox}
 excuse my mistake here :p
 
