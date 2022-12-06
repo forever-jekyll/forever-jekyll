@@ -126,8 +126,9 @@ figure > img {
 
 figcaption {
   font-size: 14px !important;
-  margin-top: -20px;
+  margin-top: 0;
   text-align: center;
+  color: $gray;
 }
 
 .gmnoprint img {
