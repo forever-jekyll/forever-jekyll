@@ -4,7 +4,11 @@ title: Hello World
 categories: [content, demo]
 ---
 
-Hello and welcome. The only purpose of this post is to greet you when your site comes alive for the first time.  
+This my first post. 
+
+Hello world!
+
+<!-- Hello and welcome. The only purpose of this post is to greet you when your site comes alive for the first time.  
 This post will demonstrate some of the more common content & elements found in posts.  
 Feel free to delete this post when you are ready to publish your first post.  
 
@@ -13,7 +17,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce bibendum neque eg
 ## Some great heading (h2)
 
 Proin convallis mi ac felis pharetra aliquam. Curabitur dignissim accumsan rutrum. In arcu magna, aliquet vel pretium et, molestie et arcu.
-<!--more--
+
 
 Mauris lobortis nulla et felis ullamcorper bibendum. Phasellus et hendrerit mauris. Proin eget nibh a massa vestibulum pretium. Suspendisse eu nisl a ante aliquet bibendum quis a nunc. Praesent varius interdum vehicula. Aenean risus libero, placerat at vestibulum eget, ultricies eu enim. Praesent nulla tortor, malesuada adipiscing adipiscing sollicitudin, adipiscing eget est.
 
@@ -120,4 +124,4 @@ Title 1 | Title 2 | Title 3 | Title 4
 lorem | lorem ipsum | lorem ipsum dolor | lorem ipsum dolor sit
 lorem ipsum dolor sit amet | lorem ipsum dolor sit amet consectetur | lorem ipsum dolor sit amet | lorem ipsum dolor sit
 lorem ipsum dolor | lorem ipsum | lorem | lorem ipsum
-lorem ipsum dolor | lorem ipsum dolor sit | lorem ipsum dolor sit amet | lorem ipsum dolor sit amet consectetur
+lorem ipsum dolor | lorem ipsum dolor sit | lorem ipsum dolor sit amet | lorem ipsum dolor sit amet consectetur -->
