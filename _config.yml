@@ -6,7 +6,7 @@
 lang: "en"
 
 # Name of your site (displayed in the header)
-title: Forever Jekyll
+title: Live Laugh Laos
 
 # Short bio or description (displayed in the header)
 description: A simple, elegant and full featured Jekyll theme
@@ -26,7 +26,7 @@ url: https://forever-jekyll.github.io
 # (http://yourusername.github.io/repository-name)
 # and NOT your User repository (http://yourusername.github.io)
 # then add in the baseurl here, like this: "/repository-name"
-baseurl: ""
+baseurl: "/live-laugh-laos"
 
 # Navigation menu
 navigation_links:
