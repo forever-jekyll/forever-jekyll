@@ -12,7 +12,7 @@ title: Live Laugh Laos
 description: A simple, elegant and full featured Jekyll theme
 
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
-avatar: /assets/image/avatar.png
+avatar: /live-laugh-laos/assets/image/avatar.png
 
 #
 # Flags below are optional
@@ -31,13 +31,13 @@ baseurl: "/live-laugh-laos"
 # Navigation menu
 navigation_links:
   - title: Blog
-    url: /
+    url: /live-laugh-laos
 
   - title: About
-    url: /about
+    url: /live-laugh-laos/about
 
   - title: Search
-    url: /search
+    url: /live-laugh-laos/search
 
 # Footer icons
 footer_links:
@@ -45,12 +45,12 @@ footer_links:
     url: feed.xml
     icon: fa fa-rss-square
 
-  - title: Twitter
-    url: https://twitter.com/jekyllrb
-    icon: fa fa-twitter-square
+  # - title: Twitter
+  #   url: https://twitter.com/jekyllrb
+  #   icon: fa fa-twitter-square
 
   - title: GitHub
-    url: https://github.com/forever-jekyll
+    url: https://github.com/cgguerra
     icon: fa fa-github-square
 
 # Enter your copyright text if you wish to override the default one.
