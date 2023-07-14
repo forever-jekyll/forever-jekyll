@@ -37,7 +37,7 @@ navigation_links:
     url: /SharkBlog/about
 
   - title: Search
-    url: /search
+    url: /SharkBlog/search
 
 # Footer icons
 footer_links:
