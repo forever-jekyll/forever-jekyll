@@ -31,10 +31,10 @@ baseurl: "/SharkBlog"
 # Navigation menu
 navigation_links:
   - title: Blog
-    url: /
+    url: /SharkBlog/
 
   - title: About
-    url: /about
+    url: /SharkBlog/about
 
   - title: Search
     url: /search
