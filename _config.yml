@@ -41,23 +41,20 @@ navigation_links:
 
 # Footer icons
 footer_links:
-  - title: Feed
-    url: feed.xml
-    icon: fa fa-rss-square
-
-  - title: Twitter
-    url: https://twitter.com/jekyllrb
-    icon: fa fa-twitter-square
+  - title: LinkedIn
+    url: https://www.linkedin.com/in/filipszarek
+    icon: fa fa-linkedin-square
 
   - title: GitHub
-    url: https://github.com/forever-jekyll
+    url: https://github.com/Filip28
     icon: fa fa-github-square
+
 
 # Enter your copyright text if you wish to override the default one.
 #copyright: "This site is made with <3 by *me, myself, and I*."
 
 # Time zone
-timezone: null
+timezone: Europe/Warsaw
 
 # Excerpt separator
 excerpt_separator: <!--more-->
