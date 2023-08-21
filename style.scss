@@ -118,7 +118,8 @@ strong, b {
 img {
     max-width: 100%;
     height: auto;
-    margin-bottom: -20px;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 figure > img {
@@ -127,6 +128,7 @@ figure > img {
 
 figcaption {
     font-size: 14px !important;
+    margin-top: -20px;
     margin-bottom: 10px;
     text-align: center;
     color: $gray;
