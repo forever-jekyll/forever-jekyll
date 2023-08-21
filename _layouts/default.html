@@ -3,7 +3,12 @@
   <head>
     {% include meta.html %}
 
-    <title>{% if page.title %}{{ page.title }} – {% endif %}{{ site.title }} – {{ site.description }}</title>
+    {% seo title=false %}
+    {% if page.title %}
+    <title>{{ page.title }}&#32;&#45;&#32;{{ site.description }}&#32;&#45;&#32;{{ site.title }}</title>
+    {% else %}
+    <title>{{ site.description }}&#32;&#45;&#32;{{ site.title }}</title>
+    {% endif %}
 
     <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css"/>
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/ress/dist/ress.min.css"/>
