@@ -116,8 +116,9 @@ strong, b {
 }
 
 img {
-  max-width: 100%;
-  height: auto;
+    max-width: 100%;
+    height: auto;
+    margin-bottom: -20px;
 }
 
 figure > img {
@@ -125,9 +126,10 @@ figure > img {
 }
 
 figcaption {
-  font-size: 14px !important;
-  margin-top: -20px;
-  text-align: center;
+    font-size: 14px !important;
+    margin-bottom: 10px;
+    text-align: center;
+    color: $gray;
 }
 
 .gmnoprint img {
@@ -457,7 +459,7 @@ a[href^="#fnref:"] {
   margin: 0;
   color: $darkGray;
   font-family: $sans-font-family;
-  font-weight: 300;
+  font-weight: 400;
   font-size: 28px !important;
   letter-spacing: 01px;
 
@@ -476,6 +478,7 @@ a[href^="#fnref:"] {
   margin: -05px 0 0 0;
   color: $gray;
   font-size: 16px !important;
+  font-weight: 400;
 
   @include mobile {
     margin: 03px 0;
@@ -497,7 +500,7 @@ nav {
     margin-left: 20px;
     color: $darkGray;
     text-align: right;
-    font-weight: 300;
+    font-weight: 400;
     letter-spacing: 01px;
 
       &:hover {
