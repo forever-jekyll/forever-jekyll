@@ -105,3 +105,10 @@ exclude:
   - LICENSE
   - README.md
   - CNAME
+
+# Robots are welcome
+include:
+  - robots.txt
+
+# Excerpt separator
+excerpt_separator: <!--more-->
