@@ -7,6 +7,11 @@ html {
   font-size: 100%;
 }
 
+
+.aligncenter {
+  text-align: center;
+}
+
 body {
   background: $white;
   font-family: $sans-font-family;
@@ -120,6 +125,14 @@ img {
     height: auto;
     margin-top: auto;
     margin-bottom: auto;
+}
+
+
+.bigimg {
+  max-width: none;
+  height: auto;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 figure > img {

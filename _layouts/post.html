@@ -26,16 +26,10 @@ layout: default
       {% unless forloop.last %}{% endunless %}
       {% endfor %}
   </div>
-
-  <div class="share-post">
-    <i class="fa fa-share-alt-square fa-fw" aria-hidden="true"></i>&nbsp;Share:&nbsp;
-    {% include share-buttons.html %}
-  </div>
-
+  
   <div class="related-posts">
     {% include related-posts.html %}
   </div>
-
   <div class="post-nav">
     {% include post-nav.html %}
   </div>

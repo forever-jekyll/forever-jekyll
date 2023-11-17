@@ -13,3 +13,6 @@ group :jekyll_plugins do
   gem "webrick"
   gem "jekyll-github-metadata"
 end
+
+# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
+gem "tzinfo-data"
