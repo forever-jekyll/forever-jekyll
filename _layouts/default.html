@@ -119,14 +119,18 @@
     <script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
     <script>
       function addDarkmodeWidget() {
-        new Darkmode().showWidget();
-        window.addEventListener('load', addDarkmodeWidget);
+        new Darkmode(){
+          autoMatchOsTheme: false,  // Do not match the OS theme
+          label: '🌓',
+        }).showWidget();
+        
+        // Ensure that light mode is enabled when the page loads
+        if (darkmode.isActivated()) {
+          darkmode.toggle();  // If dark mode is activated, toggle back to light mode
+        }
       }
-      const options = {
-        label: '🌓',
-      }
-      const darkmode = new Darkmode(options);
-            darkmode.showWidget();
+  
+      window.addEventListener('load', addDarkmodeWidget);
     </script>
 
   </body>
