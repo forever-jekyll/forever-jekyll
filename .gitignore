@@ -1,0 +1,9 @@
+# Jekyll build output
+_site/
+
+# Cache and dependencies
+.sass-cache/
+.jekyll-cache/
+.bundle/
+vendor/
+Gemfile.lock

@@ -2,6 +2,9 @@
 <html lang="{{ site.lang | default: "en" }}">
   <head>
     {% include meta.html %}
+    {%- if jekyll.environment == 'production' and site.google_analytics -%}
+      {%- include google-analytics.html -%}
+    {%- endif -%}
 
     {% seo title=false %}
     {% if page.title %}
@@ -10,7 +13,7 @@
     <title>{{ site.description }}&#32;&#45;&#32;{{ site.title }}</title>
     {% endif %}
 
-    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css"/>
+    <link rel="stylesheet" type="text/css" href="{{ site.baseurl }}/style.css">
     <link rel="apple-touch-icon" sizes="57x57" href="/assets/image/favicon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/assets/image/favicon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="/assets/image/favicon-72x72.png">
@@ -36,25 +39,24 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" media="print" onload="this.media='all'"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/ress/dist/ress.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
   </head>
 
   <body>
-    <div class="wrapper-masthead">
-      <div class="container">
-        <header class="masthead clearfix">
-          <a href="{{ site.baseurl }}/" class="site-avatar"><img src="{{ site.avatar | absolute_url }}" width="70" height="70" /></a>
-
-          <div class="site-info">
-            <h1 class="site-name"><a href="{{ site.baseurl }}/">{{ site.title }}</a></h1>
-            <p class="site-description">{{ site.description }}</p>
-          </div>
-
-          <nav class="nav-menu">
-            {% include navigation.html %}
-          </nav>
-        </header>
+      <div class="wrapper-masthead" style="background: url('/assets/image/circut.jpeg') center/cover no-repeat; background-color: #1a1001;">
+        <div class="container">
+          <header class="masthead clearfix">
+            <div class="site-info">
+              <h1 class="site-name"><a href="#">{{ site.title }}</a></h1>
+              <p class="site-description">{{ site.description }}</p>
+            </div>
+            <nav class="nav-menu">
+              {% include navigation.html %}
+            </nav>
+          </header>
+        </div>
       </div>
-    </div>
 
     <div id="main" role="main" class="container">
       {{ content }}
@@ -76,11 +78,25 @@
           </div>
           {%- endif -%}
 
+          
+          <div class="donate-buttons" style="text-align: center; margin-top: 20px;">
+            <a href="https://paypal.me/amalone341" target="_blank" style="margin: 10px;">
+              <img src="https://cdn.jsdelivr.net/gh/twolfson/paypal-github-button@1.0.0/dist/button.svg"
+                   alt="Support via PayPal" width="120">
+            </a>
+    
+            <a href="https://buymeacoffee.com/amalone341" target="_blank" style="margin: 10px;">
+              <img src="https://user-images.githubusercontent.com/1376749/120938564-50c59780-c6e1-11eb-814f-22a0399623c5.png"
+                   alt="Buy Me A Coffee" width="120">
+            </a>
+          </div>
+          
+
           <div class="copyright">
             {% if site.copyright %}
             {{ site.copyright | markdownify }}
             {% else %}
-            <p>&copy; {{ site.time | date: '%Y' }} {{ site.title | default: site.title }}. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://github.com/forever-jekyll/forever-jekyll" rel="nofollow">Forever Jekyll</a>.</p>
+            <p>&copy; {{ site.time | date: '%Y' }} {{ site.title | default: site.title }}. Made with a healthy amount of caffine.</p>
             {% endif %}
           </div>
         </footer>
