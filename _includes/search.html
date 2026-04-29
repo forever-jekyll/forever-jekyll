@@ -1,21 +1,27 @@
 <!-- Html Elements for Search -->
-<input type="text" id="search-input" placeholder="Find me piglet things" class="search-bar" autofocus>
-<br>
-<br>
-<ul id="results-container"></ul>
+
+foobar
+
+<div id="search-demo-container">
+    <input type="search" id="search-input" placeholder="search...">
+    <ul id="results-container"></ul>
+</div>
+
+foobar
 
 <section>
-    <script src="https://unpkg.com/simple-jekyll-search@latest/dest/simple-jekyll-search.min.js" type="text/javascript"></script>
-        <script>
-        SimpleJekyllSearch({
+    <script src="{{ '/assets/js/simple-jekyll-search.min.js' | prepend: site.baseurl }}"></script>
+    
+    <script>
+        window.simpleJekyllSearch = new SimpleJekyllSearch({
             searchInput: document.getElementById('search-input'),
             resultsContainer: document.getElementById('results-container'),
             json: '{{ "/assets/data/search.json" | relative_url }}',
-            searchResultTemplate: '<div class="search-title"><a href="{url}"><h3> {title}</h3></a><div class="meta"> <i class="fa fa-calendar fa-fw"></i> {date} </div><p>{excerpt}</p></div><hr> ',
-            noResultsText: '{{ "- Nothing to be done -" }}',
-            limit: 652,
-            fuzzy: false,
-            exclude: []
+            searchResultTemplate: '<li><a href="{url}?query={query}" title="{desc}">{title}</a></li>',
+            noResultsText: 'No results found',
+            limit: 10,
+            strategy: 'fuzzy',
+            exclude: ['Welcome']
         })
-        </script>
+    </script>
 </section>
